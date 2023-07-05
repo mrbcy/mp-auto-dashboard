@@ -130,6 +130,29 @@ export const constantRoutes = [
  */
 export const asyncRoutes = [
   {
+    path: '/mp',
+    component: Layout,
+    redirect: '/mp/add-article',
+    name: 'mp',
+    alwaysShow: true,
+    meta: {
+      title: '公众号管理',
+      icon: 'excel',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'add-article',
+        component: () => import('@/views/mp/add-article'),
+        name: 'PagePermission',
+        meta: {
+          title: '添加文章',
+          roles: ['admin', 'editor']
+        }
+      }
+    ]
+  },
+  {
     path: '/permission',
     component: Layout,
     redirect: '/permission/page',

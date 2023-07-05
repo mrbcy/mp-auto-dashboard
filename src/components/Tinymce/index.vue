@@ -197,6 +197,14 @@ export default {
         tinymce.destroy()
       }
     },
+    insertHtml(value) {
+      window.tinymce.get(this.tinymceId).execCommand('mceInsertContent', false, value)
+    },
+    clearFormat() {
+      window.tinymce.get(this.tinymceId).execCommand('SelectAll')
+      window.tinymce.get(this.tinymceId).execCommand('RemoveFormat')
+      window.tinymce.get(this.tinymceId).selection.collapse()
+    },
     setContent(value) {
       window.tinymce.get(this.tinymceId).setContent(value)
     },
