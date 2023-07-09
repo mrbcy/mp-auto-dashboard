@@ -51,22 +51,22 @@
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
-            <el-button v-if="posts[previewIndex].reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
-            <el-button v-if="!posts[previewIndex].reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
+            <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
+            <el-button v-if="!previewRow.reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
             <el-button size="mini" @click="cancelPreview()">关闭预览</el-button>
           </div>
-          <h2 v-show="inPreviewMode">{{ posts[previewIndex].title }}</h2>
-          <div v-show="inPreviewMode" class="pt20" v-html="posts[previewIndex].content" />
+          <h2 v-show="inPreviewMode">{{ previewRow.title }}</h2>
+          <div v-show="inPreviewMode" class="pt20" v-html="previewRow.content" />
           <div v-show="inPreviewMode" class="preview-tool-box tac">
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
-            <el-button v-if="posts[previewIndex].reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
-            <el-button v-if="!posts[previewIndex].reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
+            <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
+            <el-button v-if="!previewRow.reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
             <el-button size="mini" @click="cancelPreview()">关闭预览</el-button>
           </div>
         </div>
-        <div id="edit-box" class="edit-box">
+        <div v-show="inEditMode" id="edit-box" class="edit-box">
           <el-form ref="form" :model="form" :rules="rules" label-width="80px">
             <el-form-item label="公告标题" prop="title">
               <el-input v-model="form.title" />
@@ -89,7 +89,7 @@
 </template>
 <script>
 import Tinymce from '@/components/Tinymce'
-import { createDraft, reservePost, releasePost, listTodayPosts } from '@/api/mp-article'
+import { reservePost, releasePost, listTodayPosts, updatePost } from '@/api/mp-article'
 
 export default {
   components: { Tinymce },
@@ -132,11 +132,16 @@ export default {
       }
     }
   },
+  computed: {
+    previewRow() {
+      return this.posts[this.previewIndex] || []
+    }
+  },
   created() {
-    this.intiPosts()
+    this.initPosts()
   },
   methods: {
-    async intiPosts() {
+    async initPosts() {
       const resp = await listTodayPosts()
       const serverPosts = resp.data.items || []
       this.inPreviewMode = false
@@ -146,14 +151,14 @@ export default {
     onSave() {
       this.$refs.form.validate((valid) => {
         if (valid) {
-          createDraft(this.posts).then(() => {
-            this.posts = []
+          updatePost(this.form).then(() => {
             this.$notify({
-              title: 'Success',
-              message: '发布成功',
+              title: '保存成功',
+              message: '系统已成功保存您的修改',
               type: 'success',
               duration: 2000
             })
+            this.initPosts()
           })
         } else {
           return false
@@ -226,6 +231,7 @@ export default {
       this.form.url = row.sourceUrl
       this.form.content = row.content
       this.$refs.editor.setContent(row.content)
+      this.inEditMode = true
       this.scrollToEdit()
     },
     handleReleasePost(index, row) {

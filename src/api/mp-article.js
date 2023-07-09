@@ -32,3 +32,18 @@ export function listTodayPosts() {
     method: 'get'
   })
 }
+
+export function updatePost(post) {
+  const postId = post.id
+  const data = {
+    id: post.id,
+    title: post.title,
+    sourceUrl: post.url,
+    content: post.content
+  }
+  return request({
+    url: `/api/v1/post/${postId}`,
+    method: 'put',
+    data: data
+  })
+}
