@@ -146,7 +146,16 @@ export const asyncRoutes = [
         component: () => import('@/views/mp/add-article'),
         name: 'PagePermission',
         meta: {
-          title: '添加文章',
+          title: '创建文章草稿',
+          roles: ['admin', 'editor']
+        }
+      },
+      {
+        path: 'post-manage',
+        component: () => import('@/views/mp/post-manage'),
+        name: 'PagePermission',
+        meta: {
+          title: '岗位信息管理',
           roles: ['admin', 'editor']
         }
       }

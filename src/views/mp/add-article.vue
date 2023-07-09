@@ -64,13 +64,7 @@ export default {
         {
           title: '文章1',
           url: 'http://www.baidu.com',
-          content: `
-            <p>文章1的内容<p>
-            <p>文中附件请点击&ldquo;阅读原文&rdquo;进行下载。</p>
-            <p><span style="background-color: #ff0000; color: #ffffff;"><strong>本文源自网络，如有侵权联系删除</strong></span></p>
-            <p><span style="background-color: #ff0000; color: #ffffff;"><strong>一切需要缴费报名的招聘，各位需小心甄别，避免上当受骗。</strong></span></p>
-            <p>&nbsp;</p>
-          `
+          content: `xxxxx`
         },
         {
           title: '文章2',

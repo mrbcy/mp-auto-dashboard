@@ -11,3 +11,24 @@ export function createDraft(posts) {
     data
   })
 }
+
+export function reservePost(postId) {
+  return request({
+    url: `/api/v1/post/${postId}/reserve`,
+    method: 'post'
+  })
+}
+
+export function releasePost(postId) {
+  return request({
+    url: `/api/v1/post/${postId}/release`,
+    method: 'post'
+  })
+}
+
+export function listTodayPosts() {
+  return request({
+    url: `/api/v1/post/today`,
+    method: 'get'
+  })
+}
