@@ -50,6 +50,7 @@
           <div v-show="inPreviewMode" class="preview-tool-box tac">
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
+            <el-button size="mini" @click="gotoSourceUrl(previewIndex, posts[previewIndex])">去原链接</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
             <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
             <el-button v-if="!previewRow.reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
@@ -60,6 +61,7 @@
           <div v-show="inPreviewMode" class="preview-tool-box tac">
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
+            <el-button size="mini" @click="gotoSourceUrl(previewIndex, posts[previewIndex])">去原链接</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
             <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
             <el-button v-if="!previewRow.reserved" size="mini" type="success" @click="handleReservePost(previewIndex, posts[previewIndex])">预留</el-button>
@@ -233,6 +235,9 @@ export default {
       this.$refs.editor.setContent(row.content)
       this.inEditMode = true
       this.scrollToEdit()
+    },
+    gotoSourceUrl(index, row) {
+      window.open(row.sourceUrl, '_blank')
     },
     handleReleasePost(index, row) {
       releasePost(row.id).then(() => {

@@ -1,4 +1,4 @@
-import request from '@/utils/request-mp'
+import request from '@/utils/request'
 
 export function createDraft(posts) {
   const data = {
