@@ -1,49 +1,33 @@
 import request from '@/utils/request'
 
-export function createDraft(posts) {
-  const data = {
-    'posts': posts
-  }
-
+export function listArticles() {
   return request({
-    url: '/api/v1/create-draft',
-    method: 'post',
-    data
-  })
-}
-
-export function reservePost(postId) {
-  return request({
-    url: `/api/v1/post/${postId}/reserve`,
-    method: 'post'
-  })
-}
-
-export function releasePost(postId) {
-  return request({
-    url: `/api/v1/post/${postId}/release`,
-    method: 'post'
-  })
-}
-
-export function listTodayPosts() {
-  return request({
-    url: `/api/v1/post/today`,
+    url: `/api/v1/article/list`,
     method: 'get'
   })
 }
 
-export function updatePost(post) {
-  const postId = post.id
-  const data = {
-    id: post.id,
-    title: post.title,
-    sourceUrl: post.url,
-    content: post.content
-  }
+export function submitTodayArticle(postId) {
   return request({
-    url: `/api/v1/post/${postId}`,
+    url: `/api/v1/article/submitToday`,
+    method: 'post'
+  })
+}
+
+export function updateArticleStatus(date, status) {
+  return request({
+    url: `/api/v1/article/setStatus`,
     method: 'put',
-    data: data
+    params: {
+      date: date,
+      status: status
+    }
+  })
+}
+
+export function deleteTodayArticle(postId) {
+  return request({
+    url: `/api/v1/article/removeToday`,
+    method: 'delete'
   })
 }

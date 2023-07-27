@@ -43,7 +43,7 @@
 
 <script>
 import Tinymce from '@/components/Tinymce'
-import { createDraft } from '@/api/mp-article'
+import { createDraft } from '@/api/mp-post'
 
 export default {
   components: { Tinymce },

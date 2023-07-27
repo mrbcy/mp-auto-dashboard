@@ -2,7 +2,10 @@
   <div id="posts-container">
     <el-row class="post-container">
       <el-col :sm="24" :md="24" :lg="20">
+        <div class="pb20 tar">
+          <el-button type="primary" icon="el-icon-refresh" circle @click="manualRefreshPosts" />
 
+        </div>
         <el-table
           :data="posts"
           border
@@ -11,25 +14,33 @@
           <el-table-column
             prop="title"
             label="岗位名"
-            width="320"
           />
           <el-table-column
-            prop="sourceUrl"
-            label="来源地址"
-            width="260"
-          />
+            label="发布状态"
+            width="120"
+          >
+            <template slot-scope="scope">
+              <el-link v-if="scope.row.status == 'READY'" type="primary" :underline="false">就绪</el-link>
+              <el-link v-else-if="scope.row.status == 'DRAFT'" type="warning" :underline="false">草稿</el-link>
+              <el-link v-else-if="scope.row.status == 'PUBLISHING'" type="danger" :underline="false">发布中</el-link>
+              <el-link v-else-if="scope.row.status == 'PUBLISHED'" type="success" :underline="false">已发布</el-link>
+              <el-link v-else type="info" :underline="false">新创建</el-link>
+            </template>
+          </el-table-column>
+          <el-table-column
+            label="预留状态"
+            width="120"
+          >
+            <template slot-scope="scope">
+              <el-tag v-if="scope.row.reserved" type="warning">已预留</el-tag>
+              <el-tag v-else warning>可发布</el-tag>
+            </template>
+          </el-table-column>
           <el-table-column
             prop="pubDate"
             label="发布时间"
+            width="180"
           />
-          <el-table-column
-            label="预留状态"
-          >
-            <template slot-scope="scope">
-              <el-tag v-if="scope.row.reserved" type="danger">已预留</el-tag>
-              <el-tag v-else>准许发布</el-tag>
-            </template>
-          </el-table-column>
           <el-table-column
             prop="content"
             label="操作"
@@ -37,6 +48,9 @@
           >
             <template slot-scope="scope">
               <div>
+                <el-button size="mini" style="display: inline-block;" @click="moveUpPost(scope.$index, scope.row)">上移</el-button>
+                <el-button size="mini" style="display: inline-block;" @click="moveDownPost(scope.$index, scope.row)">下移</el-button>
+                <p />
                 <el-button size="mini" @click="previewPost(scope.$index, scope.row)">预览</el-button>
                 <el-button size="mini" @click="editPost(scope.$index, scope.row)">编辑</el-button>
                 <el-button v-if="scope.row.reserved" style="display: block; margin: 10px 0;" size="mini" type="danger" @click="handleReleasePost(scope.$index, scope.row)">释放</el-button>
@@ -91,7 +105,7 @@
 </template>
 <script>
 import Tinymce from '@/components/Tinymce'
-import { reservePost, releasePost, listTodayPosts, updatePost } from '@/api/mp-article'
+import { reservePost, releasePost, listTodayPosts, updatePost, reorderPosts } from '@/api/mp-post'
 
 export default {
   components: { Tinymce },
@@ -175,6 +189,36 @@ export default {
     cancelPreview() {
       this.inPreviewMode = false
       this.scrollToTop()
+    },
+    async moveUpPost(index, row) {
+      let copyPosts = this.posts.slice()
+      copyPosts = this.moveElementForward(copyPosts, index)
+      const postIds = copyPosts.map(item => item.id)
+      await reorderPosts(postIds)
+      this.initPosts()
+    },
+    async moveDownPost(index, row) {
+      let copyPosts = this.posts.slice()
+      copyPosts = this.moveElementBackward(copyPosts, index)
+      const postIds = copyPosts.map(item => item.id)
+      await reorderPosts(postIds)
+      this.initPosts()
+    },
+    moveElementForward(arr, index) {
+      if (index >= 0 && index < arr.length) {
+        const element = arr.splice(index, 1)
+        const newPosition = index - 1 >= 0 ? index - 1 : 0
+        arr.splice(newPosition, 0, element[0])
+      }
+      return arr
+    },
+    moveElementBackward(arr, index) {
+      if (index >= 0 && index < arr.length - 1) {
+        const element = arr.splice(index, 1)
+        const newPosition = index + 1
+        arr.splice(newPosition, 0, element[0])
+      }
+      return arr
     },
     previewPost(index, row) {
       this.previewIndex = index
@@ -260,6 +304,16 @@ export default {
           duration: 2000
         })
       })
+    },
+    manualRefreshPosts() {
+      this.initPosts().then(() => {
+        this.$notify({
+          title: '操作成功',
+          message: '岗位列表已刷新',
+          type: 'success',
+          duration: 2000
+        })
+      })
     }
   }
 }
@@ -276,5 +330,12 @@ export default {
   }
   .pt20 {
     padding-top: 20px;
+  }
+
+  .pb20 {
+    padding-bottom: 20px;
+  }
+  .tar {
+    text-align: right;
   }
 </style>
