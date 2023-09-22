@@ -170,6 +170,15 @@ export const asyncRoutes = [
           title: '创建文章草稿（手工）',
           roles: ['admin', 'editor']
         }
+      },
+      {
+        path: 'add-post',
+        component: () => import('@/views/mp/add-post'),
+        name: 'CreateMPPost',
+        meta: {
+          title: '创建岗位信息（手工）',
+          roles: ['admin', 'editor']
+        }
       }
     ]
   },

@@ -51,6 +51,9 @@
                 <el-button size="mini" style="display: inline-block;" @click="moveUpPost(scope.$index, scope.row)">上移</el-button>
                 <el-button size="mini" style="display: inline-block;" @click="moveDownPost(scope.$index, scope.row)">下移</el-button>
                 <p />
+                <el-button size="mini" style="display: inline-block;" @click="moveTopPost(scope.$index, scope.row)">置顶</el-button>
+                <el-button size="mini" style="display: inline-block;" @click="moveBottomPost(scope.$index, scope.row)">置底</el-button>
+                <p />
                 <el-button size="mini" @click="previewPost(scope.$index, scope.row)">预览</el-button>
                 <el-button size="mini" @click="editPost(scope.$index, scope.row)">编辑</el-button>
                 <el-button v-if="scope.row.reserved" style="display: block; margin: 10px 0;" size="mini" type="danger" @click="handleReleasePost(scope.$index, scope.row)">释放</el-button>
@@ -64,6 +67,8 @@
           <div v-show="inPreviewMode" class="preview-tool-box tac">
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
+            <el-button size="mini" @click="moveTopPost(previewIndex, posts[previewIndex])">置顶</el-button>
+            <el-button size="mini" @click="moveBottomPost(previewIndex, posts[previewIndex])">置底</el-button>
             <el-button size="mini" @click="gotoSourceUrl(previewIndex, posts[previewIndex])">去原链接</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
             <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
@@ -75,6 +80,8 @@
           <div v-show="inPreviewMode" class="preview-tool-box tac">
             <el-button size="mini" @click="prevPost()">上一个</el-button>
             <el-button size="mini" @click="nextPost()">下一个</el-button>
+            <el-button size="mini" @click="moveTopPost(previewIndex, posts[previewIndex])">置顶</el-button>
+            <el-button size="mini" @click="moveBottomPost(previewIndex, posts[previewIndex])">置底</el-button>
             <el-button size="mini" @click="gotoSourceUrl(previewIndex, posts[previewIndex])">去原链接</el-button>
             <el-button size="mini" @click="editPost(previewIndex, posts[previewIndex])">编辑</el-button>
             <el-button v-if="previewRow.reserved" size="mini" type="danger" @click="handleReleasePost(previewIndex, posts[previewIndex])">释放</el-button>
@@ -189,6 +196,41 @@ export default {
     cancelPreview() {
       this.inPreviewMode = false
       this.scrollToTop()
+    },
+    async moveTopPost(index, row) {
+      let copyPosts = this.posts.slice()
+      copyPosts = this.moveElementToFirst(copyPosts, index)
+      const postIds = copyPosts.map(item => item.id)
+      await reorderPosts(postIds)
+      this.initPosts()
+    },
+    async moveBottomPost(index, row) {
+      let copyPosts = this.posts.slice()
+      copyPosts = this.moveElementToLast(copyPosts, index)
+      const postIds = copyPosts.map(item => item.id)
+      await reorderPosts(postIds)
+      this.initPosts()
+    },
+    moveElementToFirst(array, index) {
+      if (index >= 0 && index < array.length) {
+        const element = array.splice(index, 1)[0]
+        array.unshift(element)
+        return array
+      } else {
+        return array
+      }
+    },
+    moveElementToLast(array, index) {
+      if (index >= array.length || index < 0) {
+        return array
+      }
+
+      const element = array[index]
+      if (index !== -1) {
+        array.splice(index, 1)
+        array.push(element)
+      }
+      return array
     },
     async moveUpPost(index, row) {
       let copyPosts = this.posts.slice()

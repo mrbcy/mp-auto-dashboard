@@ -12,6 +12,16 @@ export function createDraft(posts) {
   })
 }
 
+export function createPost(post) {
+  const data = post
+
+  return request({
+    url: '/api/v1/post',
+    method: 'post',
+    data
+  })
+}
+
 export function reservePost(postId) {
   return request({
     url: `/api/v1/post/${postId}/reserve`,
