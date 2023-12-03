@@ -14,6 +14,7 @@
           </el-form-item>
           <el-form-item>
             <el-button type="primary" @click="onAdd">添加</el-button>
+            <el-button type="primary" @click="onWeeklySummary">本周汇总</el-button>
           </el-form-item>
         </el-form>
       </el-col>
@@ -44,6 +45,7 @@
 <script>
 import Tinymce from '@/components/Tinymce'
 import { createPost } from '@/api/mp-post'
+import moment from 'moment'
 
 export default {
   components: { Tinymce },
@@ -104,8 +106,38 @@ export default {
       this.$refs.editor.clearFormat()
       console.log(this.posts)
     },
+    onWeeklySummary() {
+      const startDay = this.getWeekStart()
+      const endDay = this.getWeekEnd()
+
+      const title = `本周岗位汇总（${startDay}到${endDay}）`
+      const url = `http://performance.mrbcy.cn/static/s/${this.form.url}.html`
+      const content = `<p>大家好！本篇文章将为您汇总本周（${startDay}到${endDay}）的国企、事业单位和政府部门的岗位信息。</p>
+<p>想要查看完整的岗位信息，请点击下方的"<strong>阅读原文</strong>"链接，或直接访问：${url}</p>`
+
+      this.form.title = title
+      this.form.content = content
+      this.form.url = url
+
+      this.posts = []
+      this.posts.push(this.form)
+      this.form = {
+        title: '',
+        url: '',
+        content: ''
+      }
+      this.$refs.editor.setContent('')
+      this.$refs.editor.clearFormat()
+      console.log(this.posts)
+    },
     delArticle(index) {
       this.posts.splice(index, 1)
+    },
+    getWeekStart() {
+      return moment().startOf('week').format('M月D日')
+    },
+    getWeekEnd() {
+      return moment().endOf('week').format('M月D日')
     }
   }
 }
