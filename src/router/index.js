@@ -162,21 +162,53 @@ export const asyncRoutes = [
           roles: ['admin', 'editor']
         }
       },
-      {
-        path: 'add-article',
-        component: () => import('@/views/mp/add-article'),
-        name: 'CreateMPDraft',
-        meta: {
-          title: '创建文章草稿（手工）',
-          roles: ['admin', 'editor']
-        }
-      },
+      // {
+      //   path: 'add-article',
+      //   component: () => import('@/views/mp/add-article'),
+      //   name: 'CreateMPDraft',
+      //   meta: {
+      //     title: '创建文章草稿（手工）',
+      //     roles: ['admin', 'editor']
+      //   }
+      // },
       {
         path: 'add-post',
         component: () => import('@/views/mp/add-post'),
         name: 'CreateMPPost',
         meta: {
           title: '创建岗位信息（手工）',
+          roles: ['admin', 'editor']
+        }
+      }
+    ]
+  },
+  {
+    path: '/lpp',
+    component: Layout,
+    redirect: '/lpp/lpp-post-manage',
+    name: 'lpp',
+    alwaysShow: true,
+    meta: {
+      title: '鹏鹏上岸',
+      icon: 'el-icon-folder-checked',
+      roles: ['admin', 'editor']
+    },
+    children: [
+      {
+        path: 'lpp-post-manage',
+        component: () => import('@/views/mp/lpp/lpp-post-manage.vue'),
+        name: 'LppPostManage',
+        meta: {
+          title: '通知列表',
+          roles: ['admin', 'editor']
+        }
+      },
+      {
+        path: 'lpp-daily-share',
+        component: () => import('@/views/mp/lpp/lpp-daily-share.vue'),
+        name: 'LppDailyShare',
+        meta: {
+          title: '每日分享管理',
           roles: ['admin', 'editor']
         }
       }
