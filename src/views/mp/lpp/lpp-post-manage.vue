@@ -6,7 +6,7 @@
       <el-col :sm="24" :md="24" :lg="22">
         <el-form :inline="true" :model="searchForm" class="search-form">
           <el-form-item label="城市">
-            <el-select v-model="searchForm.city" multiple placeholder="选择城市" clearable>
+            <el-select v-model="searchForm.city" multiple placeholder="选择城市" clearable @change="handleSearch">
               <el-option
                 v-for="item in cityOptions"
                 :key="item.value"
@@ -16,7 +16,7 @@
             </el-select>
           </el-form-item>
           <el-form-item label="状态">
-            <el-select v-model="searchForm.status" multiple placeholder="选择状态" clearable>
+            <el-select v-model="searchForm.status" multiple placeholder="选择状态" clearable @change="handleSearch">
               <el-option label="未处理" value="0"></el-option>
               <el-option label="已初审" value="2"></el-option>
               <el-option label="已发布" value="4"></el-option>
@@ -39,7 +39,7 @@
           <el-button size="small" type="primary" @click="addToShareQueue" :disabled="!canAddToShareQueue">加入待分享</el-button>
         </div>
 
-        <el-table :data="posts" @selection-change="handleSelectionChange">
+        <el-table ref="postTable" :data="posts" @selection-change="handleSelectionChange">
           <el-table-column type="selection" width="55" align="center"></el-table-column>
           <el-table-column prop="postName" label="通知名"></el-table-column>
           <el-table-column prop="city" label="城市" width="100"></el-table-column>
@@ -87,35 +87,35 @@
       @show="scrollToPopoverBottom('cart-container-h3')"
     >
       <h3 id="cart-container-h3">待审核列表</h3>
-      <div v-if="reviewing">
+      <div v-if="reviewing && !noWaitReviewPosts">
         <div class="pt30">
           <h4 class="tac">审核中 <el-button type="text" @click="stopReview">退出审核</el-button></h4>
           <el-form ref="form" :model="waitReviewPosts[reviewIndex]" label-width="60px">
             <el-form-item label="通知：">
-              <span>{{ waitReviewPosts[reviewIndex].title }}</span>
+              <span>{{ waitReviewPosts[reviewIndex].postName }}</span>
             </el-form-item>
             <el-form-item label="备注：">
               <el-input v-model="waitReviewPosts[reviewIndex].desc" placeholder="请输入备注" type="textarea" :rows="4" />
             </el-form-item>
           </el-form>
           <div class="tac">
-            <el-button type="success">通过</el-button>
-            <el-button type="warning">淘汰</el-button>
+            <el-button type="success" @click="handleApprovePost(waitReviewPosts[reviewIndex])">通过</el-button>
+            <el-button type="warning" @click="handleDiscardPost(waitReviewPosts[reviewIndex])">淘汰</el-button>
           </div>
         </div>
       </div>
       <div v-else>
         <el-table :data="waitReviewPosts">
-          <el-table-column width="250" property="title" label="通知" />
-          <el-table-column width="100" property="name" label="操作">
-            <template>
-              <el-link type="primary" :underline="false">移除</el-link>
+          <el-table-column width="250" property="postName" label="通知" />
+          <el-table-column width="100" label="操作">
+            <template slot-scope="scope">
+              <el-link type="primary" :underline="false" @click="removeFromWaitReviewList(scope.row)">移除</el-link>
             </template>
           </el-table-column>
         </el-table>
         <div class="btn-container">
           <el-button type="primary" @click="startReview()">开始审核</el-button>
-          <el-button type="text" class="ml16">清空</el-button>
+          <el-button type="text" class="ml16" @click="clearWaitReviewList">清空</el-button>
         </div>
       </div>
 
@@ -129,24 +129,26 @@
       @show="scrollToPopoverBottom('publish-container-h3')"
     >
       <h3 id="publish-container-h3">待发布列表</h3>
-      <el-table :data="waitReviewPosts">
-        <el-table-column width="250" property="title" label="通知" />
-        <el-table-column width="100" property="name" label="操作">
-          <template>
-            <el-link type="primary" :underline="false">移除</el-link>
+      <el-table :data="waitSharePosts">
+        <el-table-column width="250" property="postName" label="通知" />
+        <el-table-column width="100" label="操作">
+          <template slot-scope="scope">
+            <el-link type="primary" :underline="false" @click="removeFromShareList(scope.row)">移除</el-link>
           </template>
         </el-table-column>
       </el-table>
       <div class="btn-container">
-        <el-button type="success">发布分享</el-button>
-        <el-button type="text" class="ml16">清空</el-button>
+        <el-button type="success" @click="handleCreateTodayNotification">发布分享</el-button>
+        <el-button type="text" class="ml16" @click="clearToShareList">清空</el-button>
       </div>
       <el-button slot="reference" type="warning" icon="el-icon-star-on" circle />
     </el-popover>
   </div>
 </template>
 <script>
-import { searchPosts, updatePostStatus } from '@/api/ts-post'
+import { searchPosts, updatePostStatus, approvePost, discardPost } from '@/api/ts-post'
+import { getTsList, addPostsToList, removePostsFromList, removeList } from '@/api/ts-list'
+import { createTodayNotification } from '@/api/ts-notification'
 
 export default {
   data() {
@@ -154,6 +156,7 @@ export default {
       reviewing: false,
       reviewIndex: 0,
       waitReviewPosts: [],
+      waitSharePosts: [],
       posts: [],
       searchForm: {
         city: [],
@@ -174,14 +177,25 @@ export default {
   },
   computed: {
     canAddToPendingReview() {
-      return this.searchForm.status.length === 1 && this.searchForm.status[0] === '0'
+      if (!this.selectedPosts || this.selectedPosts.length === 0) {
+        return false
+      }
+      return this.selectedPosts.every(post => post.status === 0)
     },
     canAddToShareQueue() {
-      return this.searchForm.status.length === 1 && this.searchForm.status[0] === '2'
+      if (!this.selectedPosts || this.selectedPosts.length === 0) {
+        return false
+      }
+      return this.selectedPosts.every(post => post.status === 2)
+    },
+    noWaitReviewPosts() {
+      return !this.waitReviewPosts || this.waitReviewPosts.length === 0
     }
   },
   mounted() {
     this.fetchPosts()
+    this.fetchWaitingReviewList()
+    this.fetchToShareList()
   },
   methods: {
     async fetchPosts() {
@@ -197,6 +211,82 @@ export default {
       const serverPosts = resp.data.items || []
       this.posts = serverPosts
       this.totalCount = resp.data.totalCount || 0
+    },
+    async fetchWaitingReviewList() {
+      const resp = await getTsList(1)
+      const serverPosts = resp.data.posts || []
+      this.waitReviewPosts = serverPosts
+    },
+    async fetchToShareList() {
+      const resp = await getTsList(2)
+      const serverPosts = resp.data.posts || []
+      this.waitSharePosts = serverPosts
+    },
+    async addToShareQueue() {
+      const postIds = this.selectedPosts.map(post => post.postId)
+      await addPostsToList(2, postIds)
+      this.fetchToShareList()
+    },
+    async addToPendingReview() {
+      const postIds = this.selectedPosts.map(post => post.postId)
+      await addPostsToList(1, postIds)
+      this.fetchWaitingReviewList()
+    },
+    async removeFromShareList(post) {
+      await removePostsFromList(2, [post.postId])
+      this.fetchToShareList()
+    },
+    async removeFromWaitReviewList(post) {
+      await removePostsFromList(1, [post.postId])
+      this.fetchWaitingReviewList()
+    },
+    async clearToShareList() {
+      await removeList(2)
+      this.fetchToShareList()
+    },
+    async clearWaitReviewList() {
+      await removeList(1)
+      this.fetchWaitingReviewList()
+    },
+    async showPending() {
+      this.pageNum = 1
+      this.searchForm.status = ['0']
+      await this.fetchPosts()
+      this.$refs.postTable.toggleAllSelection()
+    },
+    async showReviewed() {
+      this.pageNum = 1
+      this.searchForm.status = ['2']
+      await this.fetchPosts()
+      this.$refs.postTable.toggleAllSelection()
+    },
+    async handleCreateTodayNotification() {
+      createTodayNotification().then(() => {
+        this.$message({
+          message: '创建今日推送成功',
+          type: 'success',
+          duration: 500
+        })
+        this.fetchToShareList()
+        this.fetchPosts()
+      })
+    },
+    async handleApprovePost(post) {
+      await approvePost(post.postId, post.desc)
+
+      await this.fetchWaitingReviewList()
+      this.fetchPosts()
+      this.startReview()
+    },
+    async handleDiscardPost(post) {
+      await discardPost(post.postId, post.desc)
+
+      await this.fetchWaitingReviewList()
+      this.fetchPosts()
+
+      if (this.noWaitReviewPosts) {
+        this.stopReview()
+      }
     },
     handleSelectionChange(selectedRows) {
       this.selectedPosts = selectedRows
@@ -231,6 +321,10 @@ export default {
       })
     },
     startReview() {
+      if (this.noWaitReviewPosts) {
+        this.stopReview()
+        return
+      }
       this.reviewing = true
       this.reviewIndex = 0
       window.open(this.waitReviewPosts[this.reviewIndex].url, '_blank')

@@ -19,3 +19,25 @@ export function updatePostStatus(postId, status) {
     data: data
   })
 }
+
+export function approvePost(postId, desc) {
+  const data = {
+    desc: desc
+  }
+  return request({
+    url: `/api/v1/ts_posts/${postId}/approve`,
+    method: 'patch',
+    data: data
+  })
+}
+
+export function discardPost(postId, desc) {
+  const data = {
+    desc: desc
+  }
+  return request({
+    url: `/api/v1/ts_posts/${postId}/discard`,
+    method: 'patch',
+    data: data
+  })
+}
