@@ -160,15 +160,17 @@ export default {
       posts: [],
       searchForm: {
         city: [],
-        status: [],
+        status: ['0'],
         keyword: '',
         pageNum: 1,
         pageSize: 100
       },
       cityOptions: [
-        { value: '杭州', label: '杭州' },
         { value: '哈尔滨', label: '哈尔滨' },
-        { value: '浙江', label: '浙江' }
+        { value: '杭州', label: '杭州' },
+        { value: '沈阳', label: '沈阳' },
+        { value: '大连', label: '大连' },
+        { value: '长春', label: '长春' }
         // Add more cities as needed
       ],
       totalCount: 0,
@@ -287,6 +289,7 @@ export default {
       if (this.noWaitReviewPosts) {
         this.stopReview()
       }
+      window.open(this.waitReviewPosts[this.reviewIndex].url, '_blank')
     },
     handleSelectionChange(selectedRows) {
       this.selectedPosts = selectedRows
@@ -322,6 +325,7 @@ export default {
     },
     startReview() {
       if (this.noWaitReviewPosts) {
+        console.log('no wait review post')
         this.stopReview()
         return
       }
