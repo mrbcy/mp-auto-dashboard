@@ -60,7 +60,7 @@
               </div>
               <div style="margin-top: 5px;">
                 <el-link type="primary" @click="handleAction(scope.row, 0)">未</el-link>
-                <el-link type="success" @click="handleAction(scope.row, 2)">初</el-link>
+                <el-link type="success" @click="handleEditDesc(scope.row)">初</el-link>
                 <el-link type="warning" @click="handleAction(scope.row, 4)">发</el-link>
                 <el-link type="info" @click="handleAction(scope.row, 5)">废</el-link>
               </div>
@@ -143,6 +143,27 @@
       </div>
       <el-button slot="reference" type="warning" icon="el-icon-star-on" circle />
     </el-popover>
+
+    <!-- 添加编辑描述的对话框 -->
+    <el-dialog title="编辑描述" :visible.sync="editDescDialogVisible" width="500px">
+      <el-form :model="editingPost" label-width="80px">
+        <el-form-item label="通知名">
+          <span>{{ editingPost.postName }}</span>
+        </el-form-item>
+        <el-form-item label="描述">
+          <el-input
+            type="textarea"
+            :rows="4"
+            v-model="editingPost.desc"
+            placeholder="请输入描述">
+          </el-input>
+        </el-form-item>
+      </el-form>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="editDescDialogVisible = false">取 消</el-button>
+        <el-button type="primary" @click="submitEditDesc">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 <script>
@@ -174,7 +195,13 @@ export default {
         // Add more cities as needed
       ],
       totalCount: 0,
-      selectedPosts: []
+      selectedPosts: [],
+      editDescDialogVisible: false,
+      editingPost: {
+        postId: null,
+        postName: '',
+        desc: ''
+      }
     }
   },
   computed: {
@@ -370,6 +397,28 @@ export default {
           return 'info'
         default:
           return 'info'
+      }
+    },
+    handleEditDesc(row) {
+      this.editingPost = {
+        postId: row.postId,
+        postName: row.postName,
+        desc: row.desc || ''
+      }
+      this.editDescDialogVisible = true
+    },
+    async submitEditDesc() {
+      try {
+        await approvePost(this.editingPost.postId, this.editingPost.desc)
+        this.$message({
+          message: '更新成功',
+          type: 'success',
+          duration: 500
+        })
+        this.editDescDialogVisible = false
+        this.fetchPosts()
+      } catch (error) {
+        this.$message.error('更新失败')
       }
     }
   }
