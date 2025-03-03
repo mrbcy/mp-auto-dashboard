@@ -211,6 +211,15 @@ export const asyncRoutes = [
           title: '每日分享管理',
           roles: ['admin', 'editor']
         }
+      },
+      {
+        path: 'lpp-config-manage',
+        component: () => import('@/views/mp/lpp/lpp-config-manage.vue'),
+        name: 'LppConfigManage',
+        meta: {
+          title: '配置管理',
+          roles: ['admin', 'editor']
+        }
       }
     ]
   },
