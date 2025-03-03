@@ -11,7 +11,7 @@ export function searchConfigs(query) {
 export function updateConfig(serviceId, data) {
   return request({
     url: `/api/v1/dynamic_config/${serviceId}`,
-    method: 'put',
+    method: 'patch',
     data
   })
 }
