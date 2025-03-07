@@ -157,7 +157,7 @@ module.exports = {
     }],
     'no-unreachable': 2,
     'no-unsafe-finally': 2,
-    'no-unused-vars': [2, {
+    'no-unused-vars': [1, {
       'vars': 'all',
       'args': 'none'
     }],
@@ -208,6 +208,7 @@ module.exports = {
     'object-curly-spacing': [2, 'always', {
       objectsInObjects: false
     }],
-    'array-bracket-spacing': [2, 'never']
+    'array-bracket-spacing': [2, 'never'],
+    'require-atomic-updates': 0  // 关闭 require-atomic-updates 规则
   }
 }

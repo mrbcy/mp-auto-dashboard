@@ -14,12 +14,26 @@
             :data="groupPosts[scope.row.id] || []"
             style="width: 100%"
           >
-            <el-table-column prop="postName" label="通知名" />
+            <el-table-column prop="postName" label="通知名">
+              <template slot-scope="postScope">
+                <div :class="{ 'manual-post': postScope.row.postId === scope.row.manualPostId }">
+                  {{ postScope.row.postName }}
+                </div>
+              </template>
+            </el-table-column>
             <el-table-column prop="pubDate" label="发布日期" width="100" />
             <el-table-column prop="originSource" label="来源" width="120" />
-            <el-table-column label="操作" width="120">
+            <el-table-column label="操作" width="180">
               <template slot-scope="postScope">
                 <el-link type="primary" @click="handleJumpToPost(postScope.row)">查看原文</el-link>
+                <el-link 
+                  type="success" 
+                  style="margin-left: 10px;"
+                  @click="handleSetManualPost(scope.row, postScope.row)"
+                  :disabled="postScope.row.postId === scope.row.manualPostId"
+                >
+                  设为主通知
+                </el-link>
               </template>
             </el-table-column>
           </el-table>
@@ -59,7 +73,7 @@
 </template>
 
 <script>
-import { getPostGroupDetail } from '@/api/ts-post-group'
+import { getPostGroupDetail, setManualPostId } from '@/api/ts-post-group'
 
 export default {
   name: 'PostGroupTable',
@@ -153,7 +167,43 @@ export default {
     },
     toggleAllSelection() {
       this.$refs.postGroupTable.toggleAllSelection()
+    },
+    async handleSetManualPost(group, post) {
+      try {
+        // 调用 API 但不使用返回值
+        await setManualPostId(group.id, post.postId)
+        
+        // 创建新对象来更新，避免 race condition 警告
+        const updatedGroup = { ...group }
+        updatedGroup.manualPostId = post.postId
+        
+        // 如果 post 有 originSource、title 和 url，更新 group 的相应字段
+        if (post.originSource) {
+          updatedGroup.originSource = post.originSource
+        }
+        if (post.postName) {
+          updatedGroup.title = post.postName
+        }
+        if (post.url) {
+          updatedGroup.url = post.url
+        }
+        
+        // 使用 Object.assign 更新原对象
+        Object.assign(group, updatedGroup)
+        
+        this.$message.success('已设置为主通知')
+      } catch (error) {
+        console.error('设置主通知失败:', error)
+        this.$message.error('设置主通知失败')
+      }
     }
   }
 }
-</script> 
+</script>
+
+<style scoped>
+.manual-post {
+  font-weight: bold;
+  color: #409EFF;
+}
+</style> 

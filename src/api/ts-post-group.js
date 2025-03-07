@@ -85,4 +85,14 @@ export function discardPostGroup(groupId, desc) {
       desc
     }
   })
+}
+
+export function setManualPostId(groupId, postId) {
+  return request({
+    url: `/api/v1/ts_post_groups/${groupId}/manualPostId`,
+    method: 'patch',
+    data: {
+      postId
+    }
+  })
 } 

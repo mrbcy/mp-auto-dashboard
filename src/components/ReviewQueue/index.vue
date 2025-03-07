@@ -74,6 +74,8 @@ export default {
       }
       this.reviewing = true
       this.reviewIndex = 0
+      
+      // 触发跳转事件，父组件会处理实际的跳转
       this.$emit('jump', this.currentItem)
     },
     stopReview() {

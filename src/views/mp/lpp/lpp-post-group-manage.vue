@@ -137,7 +137,8 @@ import {
   removePostGroupsFromList,
   getWaitingReviewList,
   getToShareList,
-  clearList
+  clearList,
+  getPostGroupDetail
 } from '@/api/ts-post-group'
 import PostGroupTable from '@/components/PostGroupTable'
 import ReviewQueue from '@/components/ReviewQueue'
@@ -382,14 +383,28 @@ export default {
       this.searchForm.keyword = ''
       this.handleSearch()
     },
-    handleJumpToGroup(group) {
-      // 如果有primaryPostId，则打开对应的URL
-      if (group.primaryPostId) {
-        // 这里需要获取primaryPost的URL
-        // 简化处理，假设group对象中有primaryPostUrl属性
-        if (group.primaryPostUrl) {
-          window.open(group.primaryPostUrl, '_blank')
+    async handleJumpToGroup(group) {
+      try {
+        // 如果已经有 url 属性，直接跳转
+        if (group.url) {
+          window.open(group.url, '_blank')
+          return
         }
+        
+        // 如果没有 url 但有 groupId，获取组内的帖子并跳转到第一个帖子
+        if (group.groupId) {
+          const response = await getPostGroupDetail(group.groupId)
+          const posts = response.data || []
+          
+          if (posts.length > 0 && posts[0].url) {
+            window.open(posts[0].url, '_blank')
+          } else {
+            this.$message.warning('没有找到可跳转的链接')
+          }
+        }
+      } catch (error) {
+        console.error('跳转失败:', error)
+        this.$message.error('跳转失败')
       }
     },
     async handleAction(group, targetStatus) {
