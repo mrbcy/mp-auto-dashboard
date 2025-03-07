@@ -11,20 +11,34 @@ module.exports = {
   },
   extends: ['plugin:vue/recommended', 'eslint:recommended'],
 
-  // add your custom rules here
-  //it is base on https://github.com/vuejs/eslint-config-vue
+  // 添加自定义规则，覆盖一些过于严格的规则
   rules: {
-    "vue/max-attributes-per-line": [2, {
-      "singleline": 10,
-      "multiline": {
-        "max": 1,
-        "allowFirstLine": false
+    'vue/max-attributes-per-line': [0, {
+      'singleline': 10,
+      'multiline': {
+        'max': 1,
+        'allowFirstLine': true
       }
     }],
-    "vue/singleline-html-element-content-newline": "off",
-    "vue/multiline-html-element-content-newline":"off",
-    "vue/name-property-casing": ["error", "PascalCase"],
-    "vue/no-v-html": "off",
+    'vue/html-self-closing': [0, {
+      'html': {
+        'void': 'never',
+        'normal': 'never',
+        'component': 'never'
+      }
+    }],
+    'vue/attributes-order': [0, {
+      'order': [],
+      'alphabetical': false
+    }],
+    'vue/html-closing-bracket-newline': [0, {
+      'singleline': 'never',
+      'multiline': 'never'
+    }],
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/multiline-html-element-content-newline': 'off',
+    'vue/name-property-casing': ['error', 'PascalCase'],
+    'vue/no-v-html': 'off',
     'accessor-pairs': 2,
     'arrow-spacing': [2, {
       'before': true,
@@ -37,7 +51,7 @@ module.exports = {
     'camelcase': [0, {
       'properties': 'always'
     }],
-    'comma-dangle': [2, 'never'],
+    'comma-dangle': [0, 'never'],
     'comma-spacing': [2, {
       'before': false,
       'after': true
@@ -46,7 +60,7 @@ module.exports = {
     'constructor-super': 2,
     'curly': [2, 'multi-line'],
     'dot-location': [2, 'property'],
-    'eol-last': 2,
+    'eol-last': 0,
     'eqeqeq': ["error", "always", {"null": "ignore"}],
     'generator-star-spacing': [2, {
       'before': true,
@@ -108,7 +122,8 @@ module.exports = {
     'no-multi-spaces': 2,
     'no-multi-str': 2,
     'no-multiple-empty-lines': [2, {
-      'max': 1
+      'max': 3,
+      'maxEOF': 1
     }],
     'no-native-reassign': 2,
     'no-negated-in-lhs': 2,
@@ -132,7 +147,7 @@ module.exports = {
     'no-sparse-arrays': 2,
     'no-this-before-super': 2,
     'no-throw-literal': 2,
-    'no-trailing-spaces': 2,
+    'no-trailing-spaces': 0,
     'no-undef': 2,
     'no-undef-init': 2,
     'no-unexpected-multiline': 2,
@@ -161,12 +176,12 @@ module.exports = {
         ':': 'before'
       }
     }],
-    'padded-blocks': [2, 'never'],
+    'padded-blocks': [0, 'never'],
     'quotes': [2, 'single', {
       'avoidEscape': true,
       'allowTemplateLiterals': true
     }],
-    'semi': [2, 'never'],
+    'semi': [0, 'never'],
     'semi-spacing': [2, {
       'before': false,
       'after': true

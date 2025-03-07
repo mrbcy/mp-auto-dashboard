@@ -220,6 +220,15 @@ export const asyncRoutes = [
           title: '配置管理',
           roles: ['admin', 'editor']
         }
+      },
+      {
+        path: 'lpp-post-group-manage',
+        component: () => import('@/views/mp/lpp/lpp-post-group-manage.vue'),
+        name: 'LppPostGroupManage',
+        meta: {
+          title: '通知列表（新）',
+          roles: ['admin', 'editor']
+        }
       }
     ]
   },
