@@ -127,7 +127,7 @@
 </template>
 
 <script>
-import { createTodayNotification } from '@/api/ts-notification'
+import { createTodayGroupNotification } from '@/api/ts-group-notification'
 import { 
   searchPostGroups, 
   updatePostGroupsStatus,
@@ -317,7 +317,7 @@ export default {
     },
     async handleCreateTodayNotification() {
       try {
-        await createTodayNotification()
+        await createTodayGroupNotification()
         this.$message({
           message: '创建今日推送成功',
           type: 'success',
