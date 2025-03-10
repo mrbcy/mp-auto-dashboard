@@ -229,6 +229,15 @@ export const asyncRoutes = [
           title: '通知列表（新）',
           roles: ['admin', 'editor']
         }
+      },
+      {
+        path: 'lpp-daily-share-new',
+        component: () => import('@/views/mp/lpp/lpp-daily-share-new.vue'),
+        name: 'LppDailyShareNew',
+        meta: {
+          title: '每日分享管理（新）',
+          roles: ['admin', 'editor']
+        }
       }
     ]
   },
