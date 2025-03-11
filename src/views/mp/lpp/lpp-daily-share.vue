@@ -2,7 +2,7 @@
   <div id="post-container">
     <el-row class="post-container">
       <el-col :sm="24" :md="24" :lg="22">
-        <h2>每日分享管理（新）</h2>
+        <h2>每日分享管理</h2>
         <el-table :data="notifications">
           <el-table-column prop="date" label="日期" width="150"></el-table-column>
           <el-table-column label="通知组数量" width="100">
