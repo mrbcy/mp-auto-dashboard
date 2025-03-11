@@ -185,7 +185,7 @@ export const asyncRoutes = [
   {
     path: '/lpp',
     component: Layout,
-    redirect: '/lpp/lpp-post-manage',
+    redirect: '/lpp/lpp-post-group-manage',
     name: 'lpp',
     alwaysShow: true,
     meta: {
@@ -195,18 +195,18 @@ export const asyncRoutes = [
     },
     children: [
       {
-        path: 'lpp-post-manage',
-        component: () => import('@/views/mp/lpp/lpp-post-manage.vue'),
-        name: 'LppPostManage',
+        path: 'lpp-post-group-manage',
+        component: () => import('@/views/mp/lpp/lpp-post-group-manage.vue'),
+        name: 'LppPostGroupManage',
         meta: {
           title: '通知列表',
           roles: ['admin', 'editor']
         }
       },
       {
-        path: 'lpp-daily-share',
-        component: () => import('@/views/mp/lpp/lpp-daily-share.vue'),
-        name: 'LppDailyShare',
+        path: 'lpp-daily-share-new',
+        component: () => import('@/views/mp/lpp/lpp-daily-share-new.vue'),
+        name: 'LppDailyShareNew',
         meta: {
           title: '每日分享管理',
           roles: ['admin', 'editor']
@@ -221,24 +221,6 @@ export const asyncRoutes = [
           roles: ['admin', 'editor']
         }
       },
-      {
-        path: 'lpp-post-group-manage',
-        component: () => import('@/views/mp/lpp/lpp-post-group-manage.vue'),
-        name: 'LppPostGroupManage',
-        meta: {
-          title: '通知列表（新）',
-          roles: ['admin', 'editor']
-        }
-      },
-      {
-        path: 'lpp-daily-share-new',
-        component: () => import('@/views/mp/lpp/lpp-daily-share-new.vue'),
-        name: 'LppDailyShareNew',
-        meta: {
-          title: '每日分享管理（新）',
-          roles: ['admin', 'editor']
-        }
-      }
     ]
   },
   {
