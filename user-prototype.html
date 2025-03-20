@@ -1,0 +1,1580 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公告查询系统 - 用户端</title>
+  <!-- 引入 Element UI 的样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      height: 100vh;
+      background-color: #f0f2f5;
+    }
+    
+    .app-wrapper {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      display: flex;
+    }
+    
+    .sidebar-container {
+      width: 210px;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1001;
+      background-color: #304156;
+      overflow-y: auto;
+      transition: width 0.28s;
+    }
+    
+    .sidebar-logo-container {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      background: #2b2f3a;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    .sidebar-logo-container .sidebar-logo-link {
+      height: 100%;
+      width: 100%;
+      display: inline-block;
+    }
+    
+    .sidebar-logo-container .sidebar-title {
+      display: inline-block;
+      margin: 0;
+      color: #fff;
+      font-weight: 600;
+      line-height: 50px;
+      font-size: 14px;
+      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+      vertical-align: middle;
+    }
+    
+    .el-menu {
+      border: none;
+      height: 100%;
+      width: 100% !important;
+    }
+    
+    .el-menu-item, .el-submenu__title {
+      color: #bfcbd9;
+      height: 56px;
+      line-height: 56px;
+    }
+    
+    .el-menu-item:hover, .el-submenu__title:hover {
+      background-color: #263445 !important;
+    }
+    
+    .el-menu-item.is-active {
+      color: #409EFF;
+      background-color: #1f2d3d !important;
+    }
+    
+    .main-container {
+      min-height: 100%;
+      margin-left: 210px;
+      position: relative;
+      transition: margin-left 0.28s;
+    }
+    
+    .app-main {
+      padding: 20px;
+    }
+    
+    .app-container {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+      margin-bottom: 20px;
+    }
+    
+    .page-section {
+      display: none;
+    }
+    
+    .page-section.active {
+      display: block;
+    }
+    
+    .login-container {
+      min-height: 100%;
+      width: 100%;
+      background-color: #2d3a4b;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .login-form {
+      width: 520px;
+      max-width: 100%;
+      padding: 35px 35px 15px 35px;
+      margin: 0 auto;
+      overflow: hidden;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+    }
+    
+    .login-title {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 26px;
+      color: #303133;
+      font-weight: bold;
+    }
+    
+    .form-item {
+      margin-bottom: 20px;
+    }
+    
+    .form-item label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #606266;
+    }
+    
+    .form-item input {
+      width: 100%;
+      height: 40px;
+      padding: 0 15px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      box-sizing: border-box;
+      color: #606266;
+      transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    }
+    
+    .form-item input:focus {
+      outline: none;
+      border-color: #409EFF;
+    }
+    
+    .login-button {
+      width: 100%;
+      height: 40px;
+      background-color: #409EFF;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background-color .3s;
+    }
+    
+    .login-button:hover {
+      background-color: #66b1ff;
+    }
+    
+    .login-footer {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+    
+    .login-footer a {
+      color: #409EFF;
+      text-decoration: none;
+      font-size: 14px;
+    }
+    
+    .login-footer a:hover {
+      color: #66b1ff;
+      text-decoration: underline;
+    }
+    
+    .user-info-container {
+      padding: 20px;
+    }
+    
+    .user-info-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    
+    .user-info-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #303133;
+    }
+    
+    .user-info-card {
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+    
+    .user-info-item {
+      margin-bottom: 15px;
+      display: flex;
+    }
+    
+    .user-info-label {
+      width: 100px;
+      color: #606266;
+      font-weight: 500;
+    }
+    
+    .user-info-value {
+      flex: 1;
+      color: #303133;
+    }
+    
+    .user-info-tag {
+      display: inline-block;
+      padding: 0 10px;
+      height: 32px;
+      line-height: 30px;
+      font-size: 12px;
+      color: #409EFF;
+      background-color: rgba(64, 158, 255, 0.1);
+      border: 1px solid rgba(64, 158, 255, 0.2);
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+    
+    .forgot-password-container {
+      padding: 20px;
+    }
+    
+    .alert-message {
+      padding: 8px 16px;
+      background-color: #f4f4f5;
+      border-radius: 4px;
+      border-left: 5px solid #909399;
+      margin: 20px 0;
+    }
+    
+    .alert-message.warning {
+      background-color: #fdf6ec;
+      border-left-color: #e6a23c;
+    }
+    
+    .alert-message.info {
+      background-color: #f4f4f5;
+      border-left-color: #909399;
+    }
+    
+    .alert-message.success {
+      background-color: #f0f9eb;
+      border-left-color: #67c23a;
+    }
+    
+    .alert-message.error {
+      background-color: #fef0f0;
+      border-left-color: #f56c6c;
+    }
+    
+    .el-tabs__item {
+      padding: 0 20px;
+      height: 40px;
+      box-sizing: border-box;
+      line-height: 40px;
+      display: inline-block;
+      list-style: none;
+      font-size: 14px;
+      font-weight: 500;
+      color: #303133;
+      position: relative;
+      cursor: pointer;
+    }
+    
+    .el-tabs__item.is-active {
+      color: #409EFF;
+    }
+    
+    .el-tabs__item:hover {
+      color: #409EFF;
+    }
+    
+    .el-tabs__nav {
+      white-space: nowrap;
+      position: relative;
+      transition: transform .3s;
+      float: left;
+      z-index: 2;
+      border-bottom: 1px solid #e4e7ed;
+    }
+    
+    .el-tabs__item.is-active:after {
+      content: "";
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background-color: #409EFF;
+    }
+    
+    .el-pagination {
+      white-space: nowrap;
+      padding: 2px 5px;
+      color: #303133;
+      font-weight: bold;
+    }
+    
+    .el-pagination button {
+      border: none;
+      padding: 0 6px;
+      background: transparent;
+      height: 28px;
+      line-height: 28px;
+      min-width: 35px;
+      cursor: pointer;
+    }
+    
+    .el-pagination .el-pager {
+      user-select: none;
+      display: inline-block;
+      vertical-align: top;
+      margin: 0;
+      padding: 0;
+    }
+    
+    .el-pagination .el-pager li {
+      padding: 0 4px;
+      background: #fff;
+      vertical-align: top;
+      font-size: 13px;
+      min-width: 35px;
+      height: 28px;
+      line-height: 28px;
+      cursor: pointer;
+      box-sizing: border-box;
+      text-align: center;
+      margin: 0;
+      display: inline-block;
+    }
+    
+    .el-pagination .el-pager li.active {
+      color: #409EFF;
+      cursor: default;
+    }
+    
+    .el-pagination__jump {
+      margin-left: 24px;
+      font-weight: 400;
+      color: #606266;
+    }
+    
+    .el-pagination__editor {
+      height: 28px;
+      line-height: 28px;
+      padding: 0 2px;
+      text-align: center;
+      margin: 0 2px;
+      box-sizing: border-box;
+      border-radius: 3px;
+      width: 50px;
+      border: 1px solid #dcdfe6;
+    }
+    
+    .link-type {
+      color: #409EFF;
+      text-decoration: none;
+    }
+    
+    .link-type:hover {
+      color: #66b1ff;
+      text-decoration: underline;
+    }
+    
+    .el-button--mini {
+      padding: 7px 15px;
+      font-size: 12px;
+      border-radius: 3px;
+    }
+    
+    .match-progress {
+      background-color: #f0f9eb;
+      border-radius: 10px;
+      height: 16px;
+      width: 100px;
+      position: relative;
+    }
+    
+    .match-progress-bar {
+      background-color: #67c23a;
+      border-radius: 10px;
+      height: 16px;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    
+    .match-progress-text {
+      position: absolute;
+      top: -2px;
+      left: 40px;
+      font-size: 12px;
+    }
+    
+    .attachment-item {
+      display: flex;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #EBEEF5;
+    }
+    
+    .attachment-item:last-child {
+      border-bottom: none;
+    }
+    
+    .attachment-icon {
+      margin-right: 10px;
+      font-size: 18px;
+      color: #909399;
+    }
+    
+    .attachment-name {
+      flex: 1;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- 侧边栏 -->
+    <div class="sidebar-container">
+      <div class="sidebar-logo-container">
+        <a href="#" class="sidebar-logo-link">
+          <span class="sidebar-title">公告查询系统</span>
+        </a>
+      </div>
+      <ul class="el-menu" style="background-color: #304156;">
+        <li class="el-menu-item" onclick="showPage('login')">
+          <i class="el-icon-s-custom"></i>
+          <span>登录</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('forgot-password')">
+          <i class="el-icon-key"></i>
+          <span>忘记密码</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('user-info')">
+          <i class="el-icon-user"></i>
+          <span>个人信息</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('edit-user-info')">
+          <i class="el-icon-edit"></i>
+          <span>修改个人信息</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('announcement-search')">
+          <i class="el-icon-search"></i>
+          <span>搜索公告</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('announcement-detail')">
+          <i class="el-icon-document"></i>
+          <span>公告详情</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('position-search')">
+          <i class="el-icon-s-order"></i>
+          <span>搜索岗位</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('position-detail')">
+          <i class="el-icon-s-cooperation"></i>
+          <span>岗位详情</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="main-container">
+      <div class="app-main">
+        <!-- 登录页 -->
+        <div id="login" class="page-section active">
+          <div class="login-container">
+            <div class="login-form">
+              <h3 class="login-title">用户登录</h3>
+              <div class="form-item">
+                <label for="username">用户名</label>
+                <input type="text" id="username" placeholder="请输入用户名">
+              </div>
+              <div class="form-item">
+                <label for="password">密码</label>
+                <input type="password" id="password" placeholder="请输入密码">
+              </div>
+              <button class="login-button" onclick="simulateLogin()">登录</button>
+              <div class="login-footer">
+                <a href="javascript:void(0)" onclick="showPage('forgot-password')">忘记密码？</a>
+                <span></span>
+              </div>
+              <div class="alert-message info" style="margin-top: 20px;">
+                <p>提示：系统将保留最近两个登录设备，其他设备的登录将自动失效。</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 忘记密码页 -->
+        <div id="forgot-password" class="page-section">
+          <div class="app-container">
+            <h2>忘记密码</h2>
+            
+            <div id="no-security-question" class="alert-message warning">
+              <p>您尚未设置密保问题。如果忘记密码，请联系教务老师进行重置。</p>
+              <button class="el-button el-button--primary" style="margin-top: 10px;" onclick="showPage('login')">返回登录</button>
+            </div>
+            
+            <div id="security-question-form" style="display: none;">
+              <div class="form-item">
+                <label>密保问题</label>
+                <div style="padding: 10px; background-color: #f5f7fa; border-radius: 4px;">您的出生地是？</div>
+              </div>
+              <div class="form-item">
+                <label for="security-answer">密保答案</label>
+                <input type="text" id="security-answer" placeholder="请输入密保答案">
+              </div>
+              <button class="el-button el-button--primary" onclick="verifySecurityAnswer()">验证</button>
+              <button class="el-button" onclick="showPage('login')">返回登录</button>
+            </div>
+            
+            <div id="reset-password-form" style="display: none;">
+              <div class="alert-message success">
+                <p>密保问题验证成功，请设置新密码。</p>
+              </div>
+              <div class="form-item">
+                <label for="new-password">新密码</label>
+                <input type="password" id="new-password" placeholder="请输入新密码">
+              </div>
+              <div class="form-item">
+                <label for="confirm-password">确认密码</label>
+                <input type="password" id="confirm-password" placeholder="请再次输入新密码">
+              </div>
+              <button class="el-button el-button--primary" onclick="resetPassword()">重置密码</button>
+              <button class="el-button" onclick="showPage('login')">返回登录</button>
+            </div>
+            
+            <div id="verify-failed" style="display: none;">
+              <div class="alert-message error">
+                <p>密保问题回答错误，请联系教务老师进行密码重置。</p>
+              </div>
+              <button class="el-button el-button--primary" onclick="showPage('login')">返回登录</button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 个人信息页 -->
+        <div id="user-info" class="page-section">
+          <div class="app-container">
+            <div class="user-info-header">
+              <h2 class="user-info-title">个人信息</h2>
+              <button class="el-button el-button--primary" onclick="showPage('edit-user-info')">
+                <i class="el-icon-edit"></i> 修改信息
+              </button>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>基本信息</h3>
+              <div class="user-info-item">
+                <span class="user-info-label">姓名：</span>
+                <span class="user-info-value">张三</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-label">用户名：</span>
+                <span class="user-info-value">zhangsan123</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-label">会员有效期：</span>
+                <span class="user-info-value">2023-12-31 <span class="user-info-tag">会员</span></span>
+              </div>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>教育背景</h3>
+              <div class="user-info-item">
+                <span class="user-info-label">学历：</span>
+                <span class="user-info-value">本科</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-label">学位：</span>
+                <span class="user-info-value">学士</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-label">专业：</span>
+                <span class="user-info-value">计算机科学与技术</span>
+              </div>
+              <div class="user-info-item">
+                <span class="user-info-label">是否应届：</span>
+                <span class="user-info-value">是</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 修改个人信息页 -->
+        <div id="edit-user-info" class="page-section">
+          <div class="app-container">
+            <div class="user-info-header">
+              <h2 class="user-info-title">修改个人信息</h2>
+              <button class="el-button" onclick="showPage('user-info')">
+                <i class="el-icon-back"></i> 返回
+              </button>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>基本信息</h3>
+              <div class="form-item">
+                <label for="edit-name">姓名</label>
+                <input type="text" id="edit-name" value="张三">
+              </div>
+              <div class="form-item">
+                <label>用户名</label>
+                <div style="padding: 10px; background-color: #f5f7fa; border-radius: 4px;">zhangsan123（用户名不可修改）</div>
+              </div>
+              <div class="form-item">
+                <label for="edit-password">修改密码</label>
+                <input type="password" id="edit-password" placeholder="输入新密码，不修改请留空">
+              </div>
+              <div class="form-item">
+                <label for="edit-confirm-password">确认密码</label>
+                <input type="password" id="edit-confirm-password" placeholder="再次输入新密码">
+              </div>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>教育背景</h3>
+              <div class="form-item">
+                <label for="edit-education">学历</label>
+                <select id="edit-education" class="el-select__inner" style="width: 100%; height: 40px;">
+                  <option value="专科">专科</option>
+                  <option value="本科" selected>本科</option>
+                  <option value="硕士">硕士</option>
+                  <option value="博士">博士</option>
+                </select>
+              </div>
+              <div class="form-item">
+                <label for="edit-degree">学位</label>
+                <select id="edit-degree" class="el-select__inner" style="width: 100%; height: 40px;">
+                  <option value="无">无</option>
+                  <option value="学士" selected>学士</option>
+                  <option value="硕士">硕士</option>
+                  <option value="博士">博士</option>
+                </select>
+              </div>
+              <div class="form-item">
+                <label for="edit-major">专业</label>
+                <input type="text" id="edit-major" value="计算机科学与技术">
+              </div>
+              <div class="form-item">
+                <label>是否应届</label>
+                <div style="display: flex; gap: 20px;">
+                  <label style="display: flex; align-items: center;">
+                    <input type="radio" name="is-fresh" value="1" checked style="width: auto; margin-right: 5px;"> 是
+                  </label>
+                  <label style="display: flex; align-items: center;">
+                    <input type="radio" name="is-fresh" value="0" style="width: auto; margin-right: 5px;"> 否
+                  </label>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>密保设置</h3>
+              <div class="form-item">
+                <label for="security-question">密保问题</label>
+                <select id="security-question" class="el-select__inner" style="width: 100%; height: 40px;">
+                  <option value="birthplace" selected>您的出生地是？</option>
+                  <option value="mother">您母亲的姓名是？</option>
+                  <option value="school">您小学的名称是？</option>
+                  <option value="pet">您第一个宠物的名字是？</option>
+                </select>
+              </div>
+              <div class="form-item">
+                <label for="security-answer">密保答案</label>
+                <input type="text" id="security-answer" value="北京">
+              </div>
+            </div>
+            
+            <div style="margin-top: 20px; text-align: center;">
+              <button class="el-button el-button--primary" onclick="saveUserInfo()">保存修改</button>
+              <button class="el-button" onclick="showPage('user-info')">取消</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 搜索公告页 -->
+        <div id="announcement-search" class="page-section">
+          <div class="app-container">
+            <h2>信息查询</h2>
+            
+            <div style="margin-bottom: 20px; padding: 10px; background-color: #f5f7fa; border-radius: 4px;">
+              <label style="display: flex; align-items: center; cursor: pointer;">
+                <input type="checkbox" id="permission-toggle" style="margin-right: 10px;" onchange="togglePermission()">
+                <span>模拟拥有岗位查询权限</span>
+              </label>
+            </div>
+            
+            <div class="el-tabs">
+              <div class="el-tabs__header">
+                <div class="el-tabs__nav-wrap">
+                  <div class="el-tabs__nav">
+                    <div class="el-tabs__item is-active" onclick="switchTab('announcement-tab', 'position-tab')">公告查询</div>
+                    <div class="el-tabs__item" id="position-tab-button" onclick="switchTab('position-tab', 'announcement-tab')" style="display: none;">岗位查询</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div id="announcement-tab" class="el-tabs__content" style="display: block;">
+              <div class="filter-container" style="padding: 20px 0;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部省份</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="广东">广东</option>
+                    <option value="江苏">江苏</option>
+                    <option value="浙江">浙江</option>
+                  </select>
+                  
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部城市</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="广州">广州</option>
+                    <option value="深圳">深圳</option>
+                    <option value="杭州">杭州</option>
+                  </select>
+                  
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部区县</option>
+                    <option value="朝阳区">朝阳区</option>
+                    <option value="海淀区">海淀区</option>
+                    <option value="浦东新区">浦东新区</option>
+                    <option value="天河区">天河区</option>
+                  </select>
+                  
+                  <input type="text" class="el-input__inner" style="width: 250px; height: 40px;" placeholder="输入公告名称关键词">
+                  
+                  <button class="el-button el-button--primary" style="height: 40px;">
+                    <i class="el-icon-search"></i> 搜索
+                  </button>
+                  
+                  <button class="el-button" style="height: 40px;">
+                    <i class="el-icon-refresh"></i> 重置
+                  </button>
+                </div>
+              </div>
+              
+              <table class="el-table" style="width: 100%;">
+                <thead>
+                  <tr>
+                    <th>公告标题</th>
+                    <th>地区</th>
+                    <th>发布时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr class="el-table__row">
+                    <td>2023年北京市公务员考试公告</td>
+                    <td>北京市</td>
+                    <td>2023-05-10</td>
+                    <td>
+                      <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                        查看详情
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="el-table__row">
+                    <td>2023年上海市事业单位招聘公告</td>
+                    <td>上海市</td>
+                    <td>2023-05-08</td>
+                    <td>
+                      <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                        查看详情
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="el-table__row">
+                    <td>2023年广州市教育局教师招聘公告</td>
+                    <td>广东省广州市</td>
+                    <td>2023-05-05</td>
+                    <td>
+                      <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                        查看详情
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="el-table__row">
+                    <td>2023年深圳市龙岗区事业单位招聘公告</td>
+                    <td>广东省深圳市龙岗区</td>
+                    <td>2023-05-03</td>
+                    <td>
+                      <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                        查看详情
+                      </button>
+                    </td>
+                  </tr>
+                  <tr class="el-table__row">
+                    <td>2023年杭州市西湖区教育局教师招聘公告</td>
+                    <td>浙江省杭州市西湖区</td>
+                    <td>2023-05-01</td>
+                    <td>
+                      <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                        查看详情
+                      </button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <div class="pagination-container" style="padding: 20px 0; text-align: right;">
+                <div class="el-pagination">
+                  <button class="btn-prev">上一页</button>
+                  <ul class="el-pager">
+                    <li class="number active">1</li>
+                    <li class="number">2</li>
+                    <li class="number">3</li>
+                  </ul>
+                  <button class="btn-next">下一页</button>
+                  <span class="el-pagination__jump">
+                    前往
+                    <input class="el-pagination__editor" min="1" max="3" value="1" type="number">
+                    页
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div id="position-tab" class="el-tabs__content" style="display: none;">
+              <div class="filter-container" style="padding: 20px 0;">
+                <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部省份</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="广东">广东</option>
+                    <option value="江苏">江苏</option>
+                    <option value="浙江">浙江</option>
+                  </select>
+                  
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部城市</option>
+                    <option value="北京">北京</option>
+                    <option value="上海">上海</option>
+                    <option value="广州">广州</option>
+                    <option value="深圳">深圳</option>
+                    <option value="杭州">杭州</option>
+                  </select>
+                  
+                  <select class="el-select__inner" style="width: 120px; height: 40px;">
+                    <option value="">全部区县</option>
+                    <option value="朝阳区">朝阳区</option>
+                    <option value="海淀区">海淀区</option>
+                    <option value="浦东新区">浦东新区</option>
+                    <option value="天河区">天河区</option>
+                  </select>
+                  
+                  <input type="text" class="el-input__inner" style="width: 250px; height: 40px;" placeholder="输入岗位名称关键词">
+                  
+                  <button class="el-button el-button--primary" style="height: 40px;">
+                    <i class="el-icon-search"></i> 搜索
+                  </button>
+                  
+                  <button class="el-button" style="height: 40px;">
+                    <i class="el-icon-refresh"></i> 重置
+                  </button>
+                </div>
+                
+                <div id="no-permission-message" class="alert-message warning">
+                  <p><i class="el-icon-warning"></i> 如需要开通岗位查询功能，请联系教务老师。</p>
+                </div>
+                
+                <div id="position-search-results" style="display: none;">
+                  <table class="el-table" style="width: 100%;">
+                    <thead>
+                      <tr>
+                        <th>岗位名称</th>
+                        <th>工作单位</th>
+                        <th>地区</th>
+                        <th>公告标题</th>
+                        <th>发布日期</th>
+                        <th>匹配度</th>
+                        <th>操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr class="el-table__row">
+                        <td>信息技术岗</td>
+                        <td>市发改委</td>
+                        <td>北京市</td>
+                        <td>2023年北京市公务员考试公告</td>
+                        <td>2023-05-10</td>
+                        <td>
+                          <div class="match-progress">
+                            <div class="match-progress-bar" style="width: 95px;"></div>
+                            <span class="match-progress-text">95%</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                            查看详情
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="el-table__row">
+                        <td>综合文秘岗</td>
+                        <td>市政府办公厅</td>
+                        <td>北京市</td>
+                        <td>2023年北京市公务员考试公告</td>
+                        <td>2023-05-10</td>
+                        <td>
+                          <div class="match-progress">
+                            <div class="match-progress-bar" style="width: 90px;"></div>
+                            <span class="match-progress-text">90%</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                            查看详情
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="el-table__row">
+                        <td>教师岗</td>
+                        <td>市教育局</td>
+                        <td>广州市</td>
+                        <td>2023年广州市教育局教师招聘公告</td>
+                        <td>2023-05-05</td>
+                        <td>
+                          <div class="match-progress">
+                            <div class="match-progress-bar" style="width: 75px;"></div>
+                            <span class="match-progress-text">75%</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                            查看详情
+                          </button>
+                        </td>
+                      </tr>
+                      <tr class="el-table__row">
+                        <td>行政管理岗</td>
+                        <td>市民政局</td>
+                        <td>上海市</td>
+                        <td>2023年上海市事业单位招聘公告</td>
+                        <td>2023-05-08</td>
+                        <td>
+                          <div class="match-progress">
+                            <div class="match-progress-bar" style="width: 65px;"></div>
+                            <span class="match-progress-text">65%</span>
+                          </div>
+                        </td>
+                        <td>
+                          <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                            查看详情
+                          </button>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                  
+                  <div class="pagination-container" style="padding: 20px 0; text-align: right;">
+                    <div class="el-pagination">
+                      <button class="btn-prev">上一页</button>
+                      <ul class="el-pager">
+                        <li class="number active">1</li>
+                        <li class="number">2</li>
+                        <li class="number">3</li>
+                      </ul>
+                      <button class="btn-next">下一页</button>
+                      <span class="el-pagination__jump">
+                        前往
+                        <input class="el-pagination__editor" min="1" max="3" value="1" type="number">
+                        页
+                      </span>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 公告详情页 -->
+        <div id="announcement-detail" class="page-section">
+          <div class="app-container">
+            <div style="margin-bottom: 20px;">
+              <button class="el-button" onclick="showPage('announcement-search')">
+                <i class="el-icon-back"></i> 返回列表
+              </button>
+            </div>
+            
+            <div class="user-info-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <h2 style="margin: 0;">2023年北京市公务员考试公告</h2>
+                <div>
+                  <span class="user-info-tag" style="margin-right: 10px;">北京市</span>
+                  <span class="user-info-tag">2023-05-10</span>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <span style="font-weight: bold; margin-right: 10px;">来源：</span>
+                <a href="http://www.bjrbj.gov.cn" target="_blank" class="link-type">北京市人力资源和社会保障局</a>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <button class="el-button el-button--primary" onclick="showPage('position-list')">
+                  <i class="el-icon-s-order"></i> 查看岗位列表
+                </button>
+              </div>
+              
+              <div style="border-top: 1px solid #EBEEF5; padding-top: 20px;">
+                <h3>公告内容</h3>
+                <div style="line-height: 1.8; text-align: justify;">
+                  <p>北京市2023年度考试录用公务员公告</p>
+                  <p>根据公务员法和公务员录用有关规定，结合北京市机关用人需求，现将2023年度北京市考试录用公务员有关事项公告如下：</p>
+                  <p><strong>一、招考对象和条件</strong></p>
+                  <p>（一）具有中华人民共和国国籍；</p>
+                  <p>（二）18周岁以上、35周岁以下（1987年5月10日至2005年5月10日期间出生）；</p>
+                  <p>（三）拥护中华人民共和国宪法；</p>
+                  <p>（四）具有良好的品行；</p>
+                  <p>（五）具有正常履行职责的身体条件；</p>
+                  <p>（六）具有符合职位要求的工作能力；</p>
+                  <p>（七）具有大学专科及以上文化程度；</p>
+                  <p>（八）具备中央和北京市规定的其他条件。</p>
+                  <p><strong>二、报名时间和方式</strong></p>
+                  <p>报名时间：2023年5月15日9:00至5月21日17:00</p>
+                  <p>报名方式：登录北京市公务员考试录用网站（<a href="http://www.bjrbj.gov.cn/gwy" target="_blank">http://www.bjrbj.gov.cn/gwy</a>）进行网上报名。</p>
+                  <p><strong>三、考试时间和内容</strong></p>
+                  <p>笔试时间：2023年6月10日</p>
+                  <p>笔试内容：行政职业能力测验和申论。</p>
+                  <p>面试时间：2023年7月中旬，具体时间另行通知。</p>
+                  <p><strong>四、联系方式</strong></p>
+                  <p>咨询电话：010-12345678</p>
+                  <p>监督电话：010-87654321</p>
+                  <p>北京市公务员局</p>
+                  <p>2023年5月10日</p>
+                </div>
+              </div>
+            </div>
+            
+            <div class="user-info-card">
+              <h3>附件下载</h3>
+              <div style="margin-top: 15px;">
+                <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #EBEEF5;">
+                  <i class="el-icon-document" style="margin-right: 10px; font-size: 18px; color: #909399;"></i>
+                  <span style="flex: 1;">北京市2023年公务员招考职位表.xlsx</span>
+                  <button class="el-button el-button--primary el-button--mini">
+                    <i class="el-icon-download"></i> 下载
+                  </button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #EBEEF5;">
+                  <i class="el-icon-document" style="margin-right: 10px; font-size: 18px; color: #909399;"></i>
+                  <span style="flex: 1;">北京市2023年公务员招考报名指南.pdf</span>
+                  <button class="el-button el-button--primary el-button--mini">
+                    <i class="el-icon-download"></i> 下载
+                  </button>
+                </div>
+                <div style="display: flex; align-items: center; padding: 10px 0;">
+                  <i class="el-icon-document" style="margin-right: 10px; font-size: 18px; color: #909399;"></i>
+                  <span style="flex: 1;">北京市2023年公务员招考政策问答.pdf</span>
+                  <button class="el-button el-button--primary el-button--mini">
+                    <i class="el-icon-download"></i> 下载
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 岗位列表页 -->
+        <div id="position-list" class="page-section">
+          <div class="app-container">
+            <div style="margin-bottom: 20px;">
+              <button class="el-button" onclick="showPage('announcement-detail')">
+                <i class="el-icon-back"></i> 返回公告详情
+              </button>
+            </div>
+            
+            <h2>2023年北京市公务员考试岗位列表</h2>
+            
+            <div class="filter-container" style="padding: 20px 0;">
+              <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 15px;">
+                <select class="el-select__inner" style="width: 150px; height: 40px;">
+                  <option value="">全部单位</option>
+                  <option value="市政府办公厅">市政府办公厅</option>
+                  <option value="市发改委">市发改委</option>
+                  <option value="市教委">市教委</option>
+                </select>
+                
+                <select class="el-select__inner" style="width: 150px; height: 40px;">
+                  <option value="">全部学历要求</option>
+                  <option value="专科">专科</option>
+                  <option value="本科">本科</option>
+                  <option value="硕士">硕士</option>
+                  <option value="博士">博士</option>
+                </select>
+                
+                <select class="el-select__inner" style="width: 150px; height: 40px;">
+                  <option value="">全部专业要求</option>
+                  <option value="计算机">计算机类</option>
+                  <option value="法学">法学类</option>
+                  <option value="经济">经济类</option>
+                  <option value="行政">行政管理类</option>
+                </select>
+                
+                <input type="text" class="el-input__inner" style="width: 200px; height: 40px;" placeholder="输入岗位名称关键词">
+                
+                <button class="el-button el-button--primary" style="height: 40px;">
+                  <i class="el-icon-search"></i> 搜索
+                </button>
+                
+                <button class="el-button" style="height: 40px;">
+                  <i class="el-icon-refresh"></i> 重置
+                </button>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <button class="el-button">
+                  <i class="el-icon-document-copy"></i> 复制数据
+                </button>
+              </div>
+            </div>
+            
+            <table class="el-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>岗位名称</th>
+                  <th>工作单位</th>
+                  <th>学历要求</th>
+                  <th>专业要求</th>
+                  <th>招录人数</th>
+                  <th>匹配度</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="el-table__row">
+                  <td>综合文秘岗</td>
+                  <td>市政府办公厅</td>
+                  <td>本科及以上</td>
+                  <td>汉语言文学、行政管理</td>
+                  <td>2</td>
+                  <td>
+                    <div style="background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 90px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">90%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>法律审核岗</td>
+                  <td>市司法局</td>
+                  <td>本科及以上</td>
+                  <td>法学</td>
+                  <td>3</td>
+                  <td>
+                    <div style="background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 70px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">70%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>信息技术岗</td>
+                  <td>市发改委</td>
+                  <td>本科及以上</td>
+                  <td>计算机科学与技术、软件工程</td>
+                  <td>2</td>
+                  <td>
+                    <div style="background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 95px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">95%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>财务管理岗</td>
+                  <td>市财政局</td>
+                  <td>本科及以上</td>
+                  <td>会计学、财务管理</td>
+                  <td>2</td>
+                  <td>
+                    <div style="background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 60px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">60%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>教育管理岗</td>
+                  <td>市教委</td>
+                  <td>硕士及以上</td>
+                  <td>教育学、教育管理</td>
+                  <td>1</td>
+                  <td>
+                    <div style="background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 50px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">50%</span>
+                    </div>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('position-detail')">
+                      查看详情
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination-container" style="padding: 20px 0; text-align: right;">
+              <div class="el-pagination">
+                <button class="btn-prev">上一页</button>
+                <ul class="el-pager">
+                  <li class="number active">1</li>
+                  <li class="number">2</li>
+                  <li class="number">3</li>
+                </ul>
+                <button class="btn-next">下一页</button>
+                <span class="el-pagination__jump">
+                  前往
+                  <input class="el-pagination__editor" min="1" max="3" value="1" type="number">
+                  页
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 岗位详情页 -->
+        <div id="position-detail" class="page-section">
+          <div class="app-container">
+            <div style="margin-bottom: 20px;">
+              <button class="el-button" onclick="showPage('position-list')">
+                <i class="el-icon-back"></i> 返回岗位列表
+              </button>
+            </div>
+            
+            <div class="user-info-card">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                <h2 style="margin: 0;">信息技术岗</h2>
+                <div>
+                  <button class="el-button el-button--primary" onclick="showPage('announcement-detail')">
+                    <i class="el-icon-document"></i> 查看公告详情
+                  </button>
+                </div>
+              </div>
+              
+              <div style="margin-bottom: 20px;">
+                <div class="user-info-item">
+                  <span class="user-info-label">所属公告：</span>
+                  <span class="user-info-value">2023年北京市公务员考试公告</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">发布日期：</span>
+                  <span class="user-info-value">2023-05-10</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">匹配度：</span>
+                  <span class="user-info-value">
+                    <div style="display: inline-block; background-color: #f0f9eb; border-radius: 10px; height: 16px; width: 100px; position: relative; top: 3px;">
+                      <div style="background-color: #67c23a; border-radius: 10px; height: 16px; width: 95px; position: absolute; top: 0; left: 0;"></div>
+                      <span style="position: absolute; top: -2px; left: 40px; font-size: 12px;">95%</span>
+                    </div>
+                  </span>
+                </div>
+              </div>
+              
+              <div style="border-top: 1px solid #EBEEF5; padding-top: 20px;">
+                <h3>职位信息</h3>
+                <div class="user-info-item">
+                  <span class="user-info-label">职位名称：</span>
+                  <span class="user-info-value">信息技术岗</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">工作单位：</span>
+                  <span class="user-info-value">市发改委</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">联系电话：</span>
+                  <span class="user-info-value">010-12345678</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">报考地区：</span>
+                  <span class="user-info-value">北京市</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">职位代码：</span>
+                  <span class="user-info-value">BJ2023-0103</span>
+                </div>
+              </div>
+              
+              <div style="border-top: 1px solid #EBEEF5; padding-top: 20px; margin-top: 20px;">
+                <h3>报考条件</h3>
+                <div class="user-info-item">
+                  <span class="user-info-label">专业要求：</span>
+                  <span class="user-info-value">计算机科学与技术、软件工程</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">学历要求：</span>
+                  <span class="user-info-value">本科及以上</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">性别要求：</span>
+                  <span class="user-info-value">不限</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">应届要求：</span>
+                  <span class="user-info-value">应届或非应届均可</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">工作年限：</span>
+                  <span class="user-info-value">不限</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">定向招录：</span>
+                  <span class="user-info-value">否</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">学位要求：</span>
+                  <span class="user-info-value">学士及以上</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">学历性质：</span>
+                  <span class="user-info-value">全日制</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">基层工作经验：</span>
+                  <span class="user-info-value">不要求</span>
+                </div>
+                <div class="user-info-item">
+                  <span class="user-info-label">年龄要求：</span>
+                  <span class="user-info-value">35周岁以下</span>
+                </div>
+              </div>
+              
+              <div style="border-top: 1px solid #EBEEF5; padding-top: 20px; margin-top: 20px;">
+                <h3>职位描述</h3>
+                <div style="line-height: 1.8; text-align: justify;">
+                  <p>1. 负责单位信息系统的规划、建设和维护；</p>
+                  <p>2. 负责网络安全和数据安全管理；</p>
+                  <p>3. 负责开发和维护内部业务系统；</p>
+                  <p>4. 为单位各部门提供信息技术支持；</p>
+                  <p>5. 完成领导交办的其他工作。</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 页面切换函数
+    function showPage(pageId) {
+      // 隐藏所有页面
+      const pages = document.querySelectorAll('.page-section');
+      pages.forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // 显示指定页面
+      const targetPage = document.getElementById(pageId);
+      if (targetPage) {
+        targetPage.classList.add('active');
+      }
+      
+      // 更新侧边栏选中状态
+      const menuItems = document.querySelectorAll('.el-menu-item');
+      menuItems.forEach(item => {
+        item.classList.remove('is-active');
+        if (item.getAttribute('onclick').includes(pageId)) {
+          item.classList.add('is-active');
+        }
+      });
+    }
+    
+    // 模拟登录
+    function simulateLogin() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      if (!username || !password) {
+        alert('请输入用户名和密码');
+        return;
+      }
+      
+      // 模拟登录成功
+      alert('登录成功');
+      showPage('user-info');
+    }
+    
+    // 显示密保问题
+    function showSecurityQuestion() {
+      document.getElementById('no-security-question').style.display = 'none';
+      document.getElementById('security-question-form').style.display = 'block';
+    }
+    
+    // 验证密保答案
+    function verifySecurityAnswer() {
+      const answer = document.getElementById('security-answer').value;
+      
+      if (!answer) {
+        alert('请输入密保答案');
+        return;
+      }
+      
+      // 模拟验证成功
+      if (answer === '北京') {
+        document.getElementById('security-question-form').style.display = 'none';
+        document.getElementById('reset-password-form').style.display = 'block';
+      } else {
+        document.getElementById('security-question-form').style.display = 'none';
+        document.getElementById('verify-failed').style.display = 'block';
+      }
+    }
+    
+    // 重置密码
+    function resetPassword() {
+      const newPassword = document.getElementById('new-password').value;
+      const confirmPassword = document.getElementById('confirm-password').value;
+      
+      if (!newPassword || !confirmPassword) {
+        alert('请输入新密码和确认密码');
+        return;
+      }
+      
+      if (newPassword !== confirmPassword) {
+        alert('两次输入的密码不一致');
+        return;
+      }
+      
+      // 模拟重置成功
+      alert('密码重置成功，请使用新密码登录');
+      showPage('login');
+    }
+    
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 为忘记密码页面添加切换功能
+      const hasSecurityQuestion = true; // 模拟用户是否设置了密保问题
+      
+      if (hasSecurityQuestion) {
+        document.getElementById('no-security-question').style.display = 'none';
+        document.getElementById('security-question-form').style.display = 'block';
+      }
+    });
+
+    // 保存用户信息
+    function saveUserInfo() {
+      const name = document.getElementById('edit-name').value;
+      const password = document.getElementById('edit-password').value;
+      const confirmPassword = document.getElementById('edit-confirm-password').value;
+      const major = document.getElementById('edit-major').value;
+      const securityAnswer = document.getElementById('security-answer').value;
+      
+      if (!name) {
+        alert('姓名不能为空');
+        return;
+      }
+      
+      if (password && password !== confirmPassword) {
+        alert('两次输入的密码不一致');
+        return;
+      }
+      
+      if (!securityAnswer) {
+        alert('密保答案不能为空');
+        return;
+      }
+      
+      // 模拟保存成功
+      alert('个人信息修改成功');
+      showPage('user-info');
+    }
+    
+    // 切换标签页
+    function switchTab(showTabId, hideTabId) {
+      document.getElementById(showTabId).style.display = 'block';
+      document.getElementById(hideTabId).style.display = 'none';
+      
+      // 更新标签页选中状态
+      const tabs = document.querySelectorAll('.el-tabs__item');
+      tabs.forEach(tab => {
+        if (tab.getAttribute('onclick').includes(showTabId)) {
+          tab.classList.add('is-active');
+        } else {
+          tab.classList.remove('is-active');
+        }
+      });
+    }
+
+    // 添加权限控制功能
+    function togglePermission() {
+      const hasPermission = document.getElementById('permission-toggle').checked;
+      const positionTabButton = document.getElementById('position-tab-button');
+      const noPermissionMessage = document.getElementById('no-permission-message');
+      const positionSearchResults = document.getElementById('position-search-results');
+      
+      if (hasPermission) {
+        // 显示岗位查询标签和结果
+        positionTabButton.style.display = 'inline-block';
+        noPermissionMessage.style.display = 'none';
+        positionSearchResults.style.display = 'block';
+      } else {
+        // 隐藏岗位查询标签和结果
+        positionTabButton.style.display = 'none';
+        noPermissionMessage.style.display = 'block';
+        positionSearchResults.style.display = 'none';
+        
+        // 如果当前在岗位查询标签，切换回公告查询
+        if (document.getElementById('position-tab').style.display === 'block') {
+          switchTab('announcement-tab', 'position-tab');
+        }
+      }
+    }
+    
+    // 页面加载完成后执行
+    document.addEventListener('DOMContentLoaded', function() {
+      // 初始化权限状态
+      togglePermission();
+    });
+  </script>
+</body>
+</html> 
