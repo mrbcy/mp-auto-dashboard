@@ -1,0 +1,1160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>公告管理系统</title>
+  <!-- 引入 Element UI 的样式 -->
+  <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", Arial, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      height: 100vh;
+      background-color: #f0f2f5;
+    }
+    
+    .app-wrapper {
+      position: relative;
+      height: 100%;
+      width: 100%;
+      display: flex;
+    }
+    
+    .sidebar-container {
+      width: 210px;
+      height: 100%;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 1001;
+      background-color: #304156;
+      overflow-y: auto;
+      transition: width 0.28s;
+    }
+    
+    .sidebar-logo-container {
+      position: relative;
+      width: 100%;
+      height: 50px;
+      line-height: 50px;
+      background: #2b2f3a;
+      text-align: center;
+      overflow: hidden;
+    }
+    
+    .sidebar-logo-container .sidebar-logo-link {
+      height: 100%;
+      width: 100%;
+      display: inline-block;
+    }
+    
+    .sidebar-logo-container .sidebar-logo {
+      width: 32px;
+      height: 32px;
+      vertical-align: middle;
+      margin-right: 12px;
+    }
+    
+    .sidebar-logo-container .sidebar-title {
+      display: inline-block;
+      margin: 0;
+      color: #fff;
+      font-weight: 600;
+      line-height: 50px;
+      font-size: 14px;
+      font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
+      vertical-align: middle;
+    }
+    
+    .el-menu {
+      border: none;
+      height: 100%;
+      width: 100% !important;
+    }
+    
+    .el-menu-item, .el-submenu__title {
+      color: #bfcbd9;
+      height: 56px;
+      line-height: 56px;
+    }
+    
+    .el-menu-item:hover, .el-submenu__title:hover {
+      background-color: #263445 !important;
+    }
+    
+    .el-menu-item.is-active {
+      color: #409EFF;
+      background-color: #1f2d3d !important;
+    }
+    
+    .main-container {
+      min-height: 100%;
+      margin-left: 210px;
+      position: relative;
+      transition: margin-left 0.28s;
+    }
+    
+    .app-main {
+      padding: 20px;
+    }
+    
+    .app-container {
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 4px;
+      box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
+      margin-bottom: 20px;
+    }
+    
+    .filter-container {
+      padding-bottom: 10px;
+    }
+    
+    .pagination-container {
+      padding: 32px 16px;
+      text-align: right;
+    }
+    
+    .el-table .warning-row {
+      background: oldlace;
+    }
+    
+    .el-table .success-row {
+      background: #f0f9eb;
+    }
+    
+    .link-type, .link-type:focus {
+      color: #409EFF;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    
+    .link-type:hover {
+      color: #66b1ff;
+    }
+    
+    .filter-item {
+      display: inline-block;
+      vertical-align: middle;
+      margin-bottom: 10px;
+      margin-right: 10px;
+    }
+    
+    .page-section {
+      display: none;
+    }
+    
+    .page-section.active {
+      display: block;
+    }
+    
+    .detail-container {
+      margin-top: 20px;
+    }
+    
+    .detail-item {
+      margin-bottom: 20px;
+    }
+    
+    .detail-label {
+      font-weight: bold;
+      margin-right: 10px;
+    }
+    
+    .task-badge {
+      margin-left: 10px;
+    }
+    
+    .attachment-list {
+      margin-top: 10px;
+    }
+    
+    .attachment-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #ebeef5;
+    }
+    
+    .attachment-name {
+      flex: 1;
+    }
+    
+    .attachment-actions {
+      margin-left: 20px;
+    }
+    
+    .position-table {
+      margin-top: 20px;
+    }
+    
+    .batch-actions {
+      margin-bottom: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-wrapper">
+    <!-- 侧边栏 -->
+    <div class="sidebar-container">
+      <div class="sidebar-logo-container">
+        <a href="#" class="sidebar-logo-link">
+          <span class="sidebar-title">公告管理系统</span>
+        </a>
+      </div>
+      <ul class="el-menu" style="background-color: #304156;">
+        <li class="el-menu-item" onclick="showPage('announcement-list')">
+          <i class="el-icon-document"></i>
+          <span>公告列表</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('announcement-detail')">
+          <i class="el-icon-tickets"></i>
+          <span>公告详情</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('position-list')">
+          <i class="el-icon-s-order"></i>
+          <span>岗位列表</span>
+        </li>
+        <li class="el-menu-item" onclick="showPage('task-list')">
+          <i class="el-icon-s-claim"></i>
+          <span>任务列表</span>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- 主容器 -->
+    <div class="main-container">
+      <div class="app-main">
+        <!-- 公告列表页 -->
+        <div id="announcement-list" class="page-section active">
+          <div class="app-container">
+            <h2>公告列表</h2>
+            
+            <div class="filter-container">
+              <input class="el-input filter-item" style="width: 200px;" placeholder="公告名称" />
+              <select class="el-select filter-item" style="width: 130px;">
+                <option value="">全部地区</option>
+                <option value="北京">北京</option>
+                <option value="上海">上海</option>
+                <option value="广州">广州</option>
+                <option value="深圳">深圳</option>
+              </select>
+              <select class="el-select filter-item" style="width: 130px;">
+                <option value="">全部来源</option>
+                <option value="爬虫1">爬虫1</option>
+                <option value="爬虫2">爬虫2</option>
+                <option value="爬虫3">爬虫3</option>
+              </select>
+              <button class="el-button el-button--primary filter-item">
+                <i class="el-icon-search"></i>
+                搜索
+              </button>
+              <button class="el-button filter-item">
+                <i class="el-icon-refresh"></i>
+                重置
+              </button>
+            </div>
+            
+            <table class="el-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>公告名称</th>
+                  <th>地区</th>
+                  <th>来源</th>
+                  <th>发布时间</th>
+                  <th>状态</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="el-table__row">
+                  <td>1</td>
+                  <td>
+                    <a href="javascript:void(0)" onclick="showPage('announcement-detail')" class="link-type">
+                      2023年北京市事业单位招聘公告
+                    </a>
+                  </td>
+                  <td>北京</td>
+                  <td>北京人事考试网</td>
+                  <td>2023-05-15</td>
+                  <td>
+                    <span class="el-tag el-tag--success">已发布</span>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                      查看
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      下架
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row warning-row">
+                  <td>2</td>
+                  <td>
+                    <a href="javascript:void(0)" onclick="showPage('announcement-detail')" class="link-type">
+                      2023年上海市公务员考试公告
+                    </a>
+                  </td>
+                  <td>上海</td>
+                  <td>上海市公务员局</td>
+                  <td>2023-05-10</td>
+                  <td>
+                    <span class="el-tag el-tag--warning">待处理</span>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                      查看
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      下架
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>3</td>
+                  <td>
+                    <a href="javascript:void(0)" onclick="showPage('announcement-detail')" class="link-type">
+                      2023年广州市教育局招聘教师公告
+                    </a>
+                  </td>
+                  <td>广州</td>
+                  <td>广州市教育局</td>
+                  <td>2023-05-08</td>
+                  <td>
+                    <span class="el-tag el-tag--success">已发布</span>
+                  </td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                      查看
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      下架
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination-container">
+              <div class="el-pagination">
+                <button class="btn-prev">上一页</button>
+                <ul class="el-pager">
+                  <li class="number active">1</li>
+                  <li class="number">2</li>
+                  <li class="number">3</li>
+                </ul>
+                <button class="btn-next">下一页</button>
+                <span class="el-pagination__jump">
+                  前往
+                  <input class="el-pagination__editor" min="1" max="3" value="1" type="number">
+                  页
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 公告详情页 -->
+        <div id="announcement-detail" class="page-section">
+          <div class="app-container">
+            <div style="margin-bottom: 20px;">
+              <button class="el-button el-button--default" onclick="showPage('announcement-list')">
+                <i class="el-icon-back"></i> 返回列表
+              </button>
+            </div>
+            
+            <h2>
+              公告详情
+              <span class="el-tag el-tag--warning task-badge">有未完成任务</span>
+            </h2>
+            
+            <div class="detail-container">
+              <div class="detail-item">
+                <span class="detail-label">公告名称:</span>
+                <span>2023年上海市公务员考试公告</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">发布时间:</span>
+                <span>2023-05-10</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">来源:</span>
+                <a href="http://www.shacs.gov.cn" target="_blank" class="link-type">上海市公务员局</a>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">地区:</span>
+                <span>上海</span>
+              </div>
+              
+              <div class="detail-item">
+                <span class="detail-label">状态:</span>
+                <span class="el-tag el-tag--warning">待处理</span>
+              </div>
+              
+              <div class="detail-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="detail-label">公告内容:</span>
+                  <button class="el-button el-button--primary el-button--small">
+                    <i class="el-icon-edit"></i> 编辑
+                  </button>
+                </div>
+                <div style="border: 1px solid #DCDFE6; padding: 15px; border-radius: 4px; min-height: 200px;">
+                  <p>上海市2023年度考试录用公务员公告</p>
+                  <p>根据公务员法和公务员录用有关规定，结合上海市机关用人需求，现将2023年度上海市考试录用公务员有关事项公告如下：</p>
+                  <p>一、招考对象和条件</p>
+                  <p>（一）具有中华人民共和国国籍；</p>
+                  <p>（二）18周岁以上、35周岁以下（1987年5月10日至2005年5月10日期间出生）；</p>
+                  <p>（三）拥护中华人民共和国宪法；</p>
+                  <p>（四）具有良好的品行；</p>
+                  <p>（五）具有正常履行职责的身体条件；</p>
+                  <p>（六）具有符合职位要求的工作能力；</p>
+                  <p>（七）具有大学专科及以上文化程度；</p>
+                  <p>（八）具备中央和上海市规定的其他条件。</p>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="detail-label">附件:</span>
+                  <button class="el-button el-button--success el-button--small">
+                    <i class="el-icon-upload"></i> 上传附件
+                  </button>
+                </div>
+                
+                <div class="attachment-list">
+                  <div class="attachment-item">
+                    <div class="attachment-name">
+                      <i class="el-icon-document"></i>
+                      上海市2023年公务员招考职位表.xlsx
+                    </div>
+                    <div class="attachment-actions">
+                      <button class="el-button el-button--primary el-button--mini">
+                        <i class="el-icon-download"></i> 下载
+                      </button>
+                      <button class="el-button el-button--danger el-button--mini">
+                        <i class="el-icon-delete"></i> 删除
+                      </button>
+                    </div>
+                  </div>
+                  <div class="attachment-item">
+                    <div class="attachment-name">
+                      <i class="el-icon-document"></i>
+                      上海市2023年公务员招考报名指南.pdf
+                    </div>
+                    <div class="attachment-actions">
+                      <button class="el-button el-button--primary el-button--mini">
+                        <i class="el-icon-download"></i> 下载
+                      </button>
+                      <button class="el-button el-button--danger el-button--mini">
+                        <i class="el-icon-delete"></i> 删除
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="detail-label">相关任务:</span>
+                  <button class="el-button el-button--warning el-button--small" onclick="showPage('task-list')">
+                    <i class="el-icon-s-claim"></i> 查看任务列表
+                  </button>
+                </div>
+                
+                <div class="el-alert el-alert--warning" style="padding: 8px 16px;">
+                  <div class="el-alert__content">
+                    <span class="el-alert__title">公告正文字数不足，需要补充完整内容</span>
+                    <button class="el-button el-button--text el-button--small">
+                      标记为已完成
+                    </button>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="detail-item">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                  <span class="detail-label">岗位信息:</span>
+                  <button class="el-button el-button--primary el-button--small" onclick="showPage('position-list')">
+                    <i class="el-icon-s-order"></i> 查看岗位列表
+                  </button>
+                </div>
+                
+                <div class="el-alert el-alert--info" style="padding: 8px 16px;">
+                  <div class="el-alert__content">
+                    <span class="el-alert__title">该公告包含 156 个岗位</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div style="margin-top: 30px; text-align: center;">
+              <button class="el-button el-button--primary">
+                <i class="el-icon-upload"></i> 推送到展示端
+              </button>
+              <button class="el-button el-button--danger">
+                <i class="el-icon-delete"></i> 下架公告
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 岗位列表页 -->
+        <div id="position-list" class="page-section">
+          <div class="app-container">
+            <div style="margin-bottom: 20px;">
+              <button class="el-button el-button--default" onclick="showPage('announcement-detail')">
+                <i class="el-icon-back"></i> 返回公告详情
+              </button>
+            </div>
+            
+            <h2>岗位列表 - 2023年上海市公务员考试公告</h2>
+            
+            <div class="filter-container">
+              <input class="el-input filter-item" style="width: 200px;" placeholder="职位名称" />
+              <input class="el-input filter-item" style="width: 200px;" placeholder="工作单位" />
+              <select class="el-select filter-item" style="width: 130px;">
+                <option value="">全部学历</option>
+                <option value="本科">本科</option>
+                <option value="硕士">硕士</option>
+                <option value="博士">博士</option>
+              </select>
+              <button class="el-button el-button--primary filter-item">
+                <i class="el-icon-search"></i>
+                搜索
+              </button>
+              <button class="el-button filter-item">
+                <i class="el-icon-refresh"></i>
+                重置
+              </button>
+            </div>
+            
+            <div class="batch-actions">
+              <button class="el-button el-button--success">
+                <i class="el-icon-plus"></i> 批量新增
+              </button>
+              <button class="el-button el-button--danger">
+                <i class="el-icon-delete"></i> 批量删除
+              </button>
+              <button class="el-button el-button--warning">
+                <i class="el-icon-refresh"></i> 重新解析
+              </button>
+              <button class="el-button el-button--primary">
+                <i class="el-icon-upload"></i> 推送到展示端
+              </button>
+            </div>
+            
+            <table class="el-table position-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th style="width: 55px;">
+                    <input type="checkbox" class="el-checkbox__input">
+                  </th>
+                  <th>职位名称</th>
+                  <th>工作单位</th>
+                  <th>学历要求</th>
+                  <th>专业要求</th>
+                  <th>性别要求</th>
+                  <th>招录人数</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="el-table__row">
+                  <td>
+                    <input type="checkbox" class="el-checkbox__input">
+                  </td>
+                  <td>行政执法岗</td>
+                  <td>上海市市场监督管理局</td>
+                  <td>本科及以上</td>
+                  <td>法学、行政管理</td>
+                  <td>不限</td>
+                  <td>2</td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini">
+                      编辑
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      删除
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>
+                    <input type="checkbox" class="el-checkbox__input">
+                  </td>
+                  <td>财务管理岗</td>
+                  <td>上海市财政局</td>
+                  <td>本科及以上</td>
+                  <td>会计学、财务管理</td>
+                  <td>不限</td>
+                  <td>3</td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini">
+                      编辑
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      删除
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>
+                    <input type="checkbox" class="el-checkbox__input">
+                  </td>
+                  <td>信息技术岗</td>
+                  <td>上海市大数据中心</td>
+                  <td>硕士及以上</td>
+                  <td>计算机科学与技术、软件工程</td>
+                  <td>不限</td>
+                  <td>5</td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini">
+                      编辑
+                    </button>
+                    <button class="el-button el-button--danger el-button--mini">
+                      删除
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination-container">
+              <div class="el-pagination">
+                <button class="btn-prev">上一页</button>
+                <ul class="el-pager">
+                  <li class="number active">1</li>
+                  <li class="number">2</li>
+                  <li class="number">3</li>
+                  <li class="number">4</li>
+                  <li class="number">5</li>
+                </ul>
+                <button class="btn-next">下一页</button>
+                <span class="el-pagination__jump">
+                  前往
+                  <input class="el-pagination__editor" min="1" max="10" value="1" type="number">
+                  页
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 任务列表页 -->
+        <div id="task-list" class="page-section">
+          <div class="app-container">
+            <h2>任务列表</h2>
+            
+            <div class="filter-container">
+              <select class="el-select filter-item" style="width: 130px;">
+                <option value="">全部任务类型</option>
+                <option value="附件缺失">附件缺失</option>
+                <option value="正文不完整">正文不完整</option>
+              </select>
+              <button class="el-button el-button--primary filter-item">
+                <i class="el-icon-search"></i>
+                搜索
+              </button>
+              <button class="el-button filter-item">
+                <i class="el-icon-refresh"></i>
+                重置
+              </button>
+            </div>
+            
+            <table class="el-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>公告名称</th>
+                  <th>任务类型</th>
+                  <th>创建时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="el-table__row">
+                  <td>1</td>
+                  <td>
+                    <a href="javascript:void(0)" onclick="showPage('announcement-detail')" class="link-type">
+                      2023年上海市公务员考试公告
+                    </a>
+                  </td>
+                  <td>
+                    <span class="el-tag el-tag--warning">正文不完整</span>
+                  </td>
+                  <td>2023-05-10 15:30:22</td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                      处理
+                    </button>
+                    <button class="el-button el-button--success el-button--mini">
+                      标记完成
+                    </button>
+                  </td>
+                </tr>
+                <tr class="el-table__row">
+                  <td>2</td>
+                  <td>
+                    <a href="javascript:void(0)" onclick="showPage('announcement-detail')" class="link-type">
+                      2023年广州市教育局招聘教师公告
+                    </a>
+                  </td>
+                  <td>
+                    <span class="el-tag el-tag--danger">附件缺失</span>
+                  </td>
+                  <td>2023-05-08 09:15:47</td>
+                  <td>
+                    <button class="el-button el-button--primary el-button--mini" onclick="showPage('announcement-detail')">
+                      处理
+                    </button>
+                    <button class="el-button el-button--success el-button--mini">
+                      标记完成
+                    </button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <div class="pagination-container">
+              <div class="el-pagination">
+                <button class="btn-prev">上一页</button>
+                <ul class="el-pager">
+                  <li class="number active">1</li>
+                  <li class="number">2</li>
+                </ul>
+                <button class="btn-next">下一页</button>
+                <span class="el-pagination__jump">
+                  前往
+                  <input class="el-pagination__editor" min="1" max="2" value="1" type="number">
+                  页
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 页面切换功能
+    function showPage(pageId) {
+      // 隐藏所有页面
+      const pages = document.querySelectorAll('.page-section');
+      pages.forEach(page => {
+        page.classList.remove('active');
+      });
+      
+      // 显示选中的页面
+      const selectedPage = document.getElementById(pageId);
+      if (selectedPage) {
+        selectedPage.classList.add('active');
+      }
+      
+      // 更新侧边栏选中状态
+      const menuItems = document.querySelectorAll('.el-menu-item');
+      menuItems.forEach(item => {
+        item.classList.remove('is-active');
+      });
+      
+      // 找到对应的菜单项并设置为选中状态
+      const menuItem = Array.from(menuItems).find(item => {
+        return item.getAttribute('onclick').includes(pageId);
+      });
+      
+      if (menuItem) {
+        menuItem.classList.add('is-active');
+      }
+    }
+    
+    // 初始化页面
+    document.addEventListener('DOMContentLoaded', function() {
+      // 默认显示公告列表页
+      showPage('announcement-list');
+      
+      // 为第一个菜单项添加选中状态
+      const firstMenuItem = document.querySelector('.el-menu-item');
+      if (firstMenuItem) {
+        firstMenuItem.classList.add('is-active');
+      }
+      
+      // 添加批量新增岗位的对话框功能
+      const addPositionButtons = document.querySelectorAll('.batch-actions .el-button--success');
+      addPositionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          document.getElementById('add-position-dialog').style.display = 'block';
+        });
+      });
+      
+      // 关闭对话框
+      const closeButtons = document.querySelectorAll('.el-dialog__close, .dialog-footer .el-button:not(.el-button--primary)');
+      closeButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const dialogs = document.querySelectorAll('.el-dialog__wrapper');
+          dialogs.forEach(dialog => {
+            dialog.style.display = 'none';
+          });
+        });
+      });
+      
+      // 切换批量添加岗位的方式
+      const addMethodTabs = document.querySelectorAll('.add-method-tabs .el-tabs__item');
+      addMethodTabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+          // 移除所有选中状态
+          addMethodTabs.forEach(t => t.classList.remove('is-active'));
+          // 添加当前选中状态
+          this.classList.add('is-active');
+          
+          // 隐藏所有内容面板
+          const panels = document.querySelectorAll('.add-method-content');
+          panels.forEach(panel => {
+            panel.style.display = 'none';
+          });
+          
+          // 显示对应的内容面板
+          const panelId = this.getAttribute('data-panel');
+          document.getElementById(panelId).style.display = 'block';
+        });
+      });
+      
+      // 连接编辑公告内容按钮与对话框
+      const editContentButtons = document.querySelectorAll('.detail-item .el-button--primary');
+      editContentButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          document.getElementById('edit-announcement-dialog').style.display = 'block';
+        });
+      });
+      
+      // 添加上传附件功能
+      const uploadAttachmentButton = document.querySelector('.detail-item .el-button--success');
+      if (uploadAttachmentButton) {
+        uploadAttachmentButton.addEventListener('click', function() {
+          // 模拟文件上传对话框
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.accept = '.pdf,.doc,.docx,.xls,.xlsx';
+          input.click();
+          
+          // 模拟上传成功
+          input.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+              const fileName = this.files[0].name;
+              alert(`文件 "${fileName}" 上传成功！`);
+              
+              // 可以在这里添加代码来动态添加新的附件到列表中
+            }
+          });
+        });
+      }
+      
+      // 添加任务标记完成功能
+      const completeTaskButtons = document.querySelectorAll('.el-alert__content .el-button');
+      completeTaskButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const alertElement = this.closest('.el-alert');
+          alertElement.style.display = 'none';
+          alert('任务已标记为完成！');
+        });
+      });
+      
+      // 添加岗位编辑功能
+      const editPositionButtons = document.querySelectorAll('.position-table .el-button--primary');
+      editPositionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const positionName = row.cells[1].textContent.trim();
+          alert(`编辑岗位: ${positionName}`);
+          // 这里可以添加打开编辑岗位对话框的代码
+        });
+      });
+      
+      // 添加岗位删除功能
+      const deletePositionButtons = document.querySelectorAll('.position-table .el-button--danger');
+      deletePositionButtons.forEach(button => {
+        button.addEventListener('click', function() {
+          const row = this.closest('tr');
+          const positionName = row.cells[1].textContent.trim();
+          if (confirm(`确定要删除岗位 "${positionName}" 吗？`)) {
+            row.remove();
+            alert('岗位已删除！');
+          }
+        });
+      });
+      
+      // 添加批量删除功能
+      const batchDeleteButton = document.querySelector('.batch-actions .el-button--danger');
+      if (batchDeleteButton) {
+        batchDeleteButton.addEventListener('click', function() {
+          const checkedBoxes = document.querySelectorAll('.position-table input[type="checkbox"]:checked');
+          if (checkedBoxes.length === 0) {
+            alert('请先选择要删除的岗位！');
+            return;
+          }
+          
+          if (confirm(`确定要删除选中的 ${checkedBoxes.length} 个岗位吗？`)) {
+            checkedBoxes.forEach(checkbox => {
+              const row = checkbox.closest('tr');
+              row.remove();
+            });
+            alert('已删除选中的岗位！');
+          }
+        });
+      }
+      
+      // 添加全选/取消全选功能
+      const headerCheckbox = document.querySelector('.position-table thead input[type="checkbox"]');
+      if (headerCheckbox) {
+        headerCheckbox.addEventListener('change', function() {
+          const checkboxes = document.querySelectorAll('.position-table tbody input[type="checkbox"]');
+          checkboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+          });
+        });
+      }
+      
+      // 添加重新解析功能
+      const reParseButton = document.querySelector('.batch-actions .el-button--warning');
+      if (reParseButton) {
+        reParseButton.addEventListener('click', function() {
+          if (confirm('确定要重新解析本公告的岗位列表吗？这将覆盖当前的岗位数据。')) {
+            alert('已发送重新解析请求，请稍后刷新页面查看结果。');
+          }
+        });
+      }
+      
+      // 添加推送到展示端功能
+      const pushButtons = document.querySelectorAll('.el-button--primary:not(.filter-item):not(.el-button--mini)');
+      pushButtons.forEach(button => {
+        if (button.textContent.includes('推送')) {
+          button.addEventListener('click', function() {
+            if (confirm('确定要将数据推送到展示端吗？')) {
+              alert('推送成功！');
+            }
+          });
+        }
+      });
+      
+      // 添加下架公告功能
+      const unpublishButtons = document.querySelectorAll('.el-button--danger:not(.el-button--mini)');
+      unpublishButtons.forEach(button => {
+        if (button.textContent.includes('下架')) {
+          button.addEventListener('click', function() {
+            if (confirm('确定要下架该公告吗？')) {
+              alert('公告已下架！');
+              // 可以在这里添加跳转回列表页的代码
+              showPage('announcement-list');
+            }
+          });
+        }
+      });
+    });
+  </script>
+  
+  <!-- 批量添加岗位对话框 -->
+  <div id="add-position-dialog" class="el-dialog__wrapper" style="display: none;">
+    <div class="el-dialog" style="margin-top: 15vh; width: 70%;">
+      <div class="el-dialog__header">
+        <span class="el-dialog__title">批量添加岗位</span>
+        <button type="button" class="el-dialog__headerbtn el-dialog__close">
+          <i class="el-icon-close"></i>
+        </button>
+      </div>
+      <div class="el-dialog__body">
+        <div class="add-method-tabs" style="margin-bottom: 20px;">
+          <div class="el-tabs__header">
+            <div class="el-tabs__nav-wrap">
+              <div class="el-tabs__nav">
+                <div class="el-tabs__item is-active" data-panel="text-parse-panel">文本解析</div>
+                <div class="el-tabs__item" data-panel="table-parse-panel">表格解析</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <div id="text-parse-panel" class="add-method-content" style="display: block;">
+          <p>请输入包含岗位信息的文本，系统将使用AI自动解析出岗位列表：</p>
+          <textarea class="el-textarea__inner" style="width: 100%; height: 200px; margin-bottom: 20px;" placeholder="粘贴包含岗位信息的文本..."></textarea>
+          <div style="text-align: center;">
+            <button class="el-button el-button--primary">
+              <i class="el-icon-magic-stick"></i> 智能解析
+            </button>
+          </div>
+        </div>
+        
+        <div id="table-parse-panel" class="add-method-content" style="display: none;">
+          <p>请粘贴表格数据，并指定每列对应的字段：</p>
+          <textarea class="el-textarea__inner" style="width: 100%; height: 150px; margin-bottom: 20px;" placeholder="粘贴表格数据..."></textarea>
+          
+          <div style="margin-bottom: 20px;">
+            <h4>列映射设置：</h4>
+            <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+              <div style="flex: 0 0 30%;">
+                <label>第1列：</label>
+                <select class="el-select__inner" style="width: 80%;">
+                  <option value="">请选择字段</option>
+                  <option value="position_name">职位名称</option>
+                  <option value="department">工作单位</option>
+                  <option value="education">学历要求</option>
+                  <option value="major">专业要求</option>
+                  <option value="gender">性别要求</option>
+                  <option value="count">招录人数</option>
+                </select>
+              </div>
+              <div style="flex: 0 0 30%;">
+                <label>第2列：</label>
+                <select class="el-select__inner" style="width: 80%;">
+                  <option value="">请选择字段</option>
+                  <option value="position_name">职位名称</option>
+                  <option value="department">工作单位</option>
+                  <option value="education">学历要求</option>
+                  <option value="major">专业要求</option>
+                  <option value="gender">性别要求</option>
+                  <option value="count">招录人数</option>
+                </select>
+              </div>
+              <div style="flex: 0 0 30%;">
+                <label>第3列：</label>
+                <select class="el-select__inner" style="width: 80%;">
+                  <option value="">请选择字段</option>
+                  <option value="position_name">职位名称</option>
+                  <option value="department">工作单位</option>
+                  <option value="education">学历要求</option>
+                  <option value="major">专业要求</option>
+                  <option value="gender">性别要求</option>
+                  <option value="count">招录人数</option>
+                </select>
+              </div>
+              <div style="flex: 0 0 30%;">
+                <label>第4列：</label>
+                <select class="el-select__inner" style="width: 80%;">
+                  <option value="">请选择字段</option>
+                  <option value="position_name">职位名称</option>
+                  <option value="department">工作单位</option>
+                  <option value="education">学历要求</option>
+                  <option value="major">专业要求</option>
+                  <option value="gender">性别要求</option>
+                  <option value="count">招录人数</option>
+                </select>
+              </div>
+              <div style="flex: 0 0 30%;">
+                <label>第5列：</label>
+                <select class="el-select__inner" style="width: 80%;">
+                  <option value="">请选择字段</option>
+                  <option value="position_name">职位名称</option>
+                  <option value="department">工作单位</option>
+                  <option value="education">学历要求</option>
+                  <option value="major">专业要求</option>
+                  <option value="gender">性别要求</option>
+                  <option value="count">招录人数</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <div style="text-align: center;">
+            <button class="el-button el-button--primary">
+              <i class="el-icon-s-grid"></i> 解析表格
+            </button>
+          </div>
+        </div>
+        
+        <div style="margin-top: 20px; border-top: 1px solid #EBEEF5; padding-top: 20px;">
+          <h4>解析结果预览：</h4>
+          <div style="max-height: 200px; overflow-y: auto;">
+            <table class="el-table" style="width: 100%;">
+              <thead>
+                <tr>
+                  <th>职位名称</th>
+                  <th>工作单位</th>
+                  <th>学历要求</th>
+                  <th>专业要求</th>
+                  <th>性别要求</th>
+                  <th>招录人数</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr class="el-table__row">
+                  <td>暂无数据</td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                  <td></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="el-dialog__footer dialog-footer">
+        <button class="el-button">取消</button>
+        <button class="el-button el-button--primary">确认添加</button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 编辑公告内容对话框 -->
+  <div id="edit-announcement-dialog" class="el-dialog__wrapper" style="display: none;">
+    <div class="el-dialog" style="margin-top: 15vh; width: 70%;">
+      <div class="el-dialog__header">
+        <span class="el-dialog__title">编辑公告内容</span>
+        <button type="button" class="el-dialog__headerbtn el-dialog__close">
+          <i class="el-icon-close"></i>
+        </button>
+      </div>
+      <div class="el-dialog__body">
+        <div class="el-form-item">
+          <label class="el-form-item__label">公告标题</label>
+          <div class="el-form-item__content">
+            <input type="text" class="el-input__inner" style="width: 100%;" value="2023年上海市公务员考试公告">
+          </div>
+        </div>
+        <div class="el-form-item">
+          <label class="el-form-item__label">公告内容</label>
+          <div class="el-form-item__content">
+            <div style="border: 1px solid #DCDFE6; padding: 5px;">
+              <div style="background-color: #f5f7fa; padding: 5px; border-bottom: 1px solid #DCDFE6;">
+                <button class="el-button el-button--default el-button--mini">B</button>
+                <button class="el-button el-button--default el-button--mini"><i>I</i></button>
+                <button class="el-button el-button--default el-button--mini"><u>U</u></button>
+                <button class="el-button el-button--default el-button--mini">H1</button>
+                <button class="el-button el-button--default el-button--mini">H2</button>
+                <button class="el-button el-button--default el-button--mini"><i class="el-icon-link"></i></button>
+                <button class="el-button el-button--default el-button--mini"><i class="el-icon-picture"></i></button>
+              </div>
+              <textarea class="el-textarea__inner" style="width: 100%; height: 300px; border: none; resize: none;">上海市2023年度考试录用公务员公告
+
+根据公务员法和公务员录用有关规定，结合上海市机关用人需求，现将2023年度上海市考试录用公务员有关事项公告如下：
+
+一、招考对象和条件
+（一）具有中华人民共和国国籍；
+（二）18周岁以上、35周岁以下（1987年5月10日至2005年5月10日期间出生）；
+（三）拥护中华人民共和国宪法；
+（四）具有良好的品行；
+（五）具有正常履行职责的身体条件；
+（六）具有符合职位要求的工作能力；
+（七）具有大学专科及以上文化程度；
+（八）具备中央和上海市规定的其他条件。</textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="el-dialog__footer dialog-footer">
+        <button class="el-button">取消</button>
+        <button class="el-button el-button--primary">保存</button>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
